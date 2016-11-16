@@ -1,0 +1,47 @@
+<html>
+	<head>
+		<title>Project 1</title>
+		<style>
+			body { margin: 0; }
+			canvas { width: 100%; height: 100% }
+		</style>
+	</head>
+	<body>
+		<script src="js/three.js"></script>
+		<script>
+
+			var scene = new THREE.Scene();
+			var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
+			camera.position.z = 30;
+
+			var renderer = new THREE.WebGLRenderer({antialias:true});
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			document.body.appendChild( renderer.domElement );
+
+			var geometry = new THREE.TorusKnotGeometry( 10, 3, 256, 128);
+			var material = new THREE.MeshStandardMaterial( { color: 0x33aaee } );
+			var torus = new THREE.Mesh( geometry, material );
+			scene.add( torus );
+
+			var pointLight = new THREE.PointLight(0xdddddd, 0.5);
+			scene.add(pointLight);
+			pointLight.position.y = 40;
+			pointLight.position.x = 40;
+
+
+			var hemisphereLight = new THREE.HemisphereLight(0x8899cc, 0x334455);
+			scene.add(hemisphereLight);
+			
+			var render = function () {
+				requestAnimationFrame( render );
+
+				torus.rotation.x += 0.005;
+				torus.rotation.y += 0.005;
+
+				renderer.render(scene, camera);
+			};
+
+			render();
+		</script>
+	</body>
+</html>

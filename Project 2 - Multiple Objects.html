@@ -1,0 +1,60 @@
+<html>
+	<head>
+		<title>Project 2 - Multiple Objects</title>
+		<style>
+			body { margin: 0; }
+			canvas { width: 100%; height: 100% }
+		</style>
+	</head>
+	<body>
+		<script src="js/three.js"></script>
+		<script>
+
+			var scene = new THREE.Scene();
+			var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
+			camera.position.z = 30;
+
+			var renderer = new THREE.WebGLRenderer({antialias:true});
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			document.body.appendChild( renderer.domElement );
+
+			var gridDimension = 10;
+			var halfgrid = gridDimension / 2;
+
+			var geometry = new THREE.BoxGeometry( 3, 3, 3);
+
+			for (var i = 0; i < gridDimension; i++ ) {
+				for (var j = 0; j < gridDimension; j++) {
+					var material = new THREE.MeshStandardMaterial( { color: 0x33aaee } );
+					var box = new THREE.Mesh( geometry, material );
+					box.position.x = (i-halfgrid) * 5;
+					box.position.y = (j-halfgrid) * 5;
+					scene.add( box );
+				}
+			}
+
+
+			var pointLight = new THREE.PointLight(0xdddddd, 0.5);
+			scene.add(pointLight);
+			pointLight.position.z = 12;
+
+
+			var hemisphereLight = new THREE.HemisphereLight(0x8899cc, 0x334455);
+			scene.add(hemisphereLight);
+			
+			var render = function () {
+				requestAnimationFrame( render );
+
+				for (var i = 0; i < scene.children.length; i++ ) {
+					scene.children[i].rotation.x = 0.01;
+				}
+			//	torus.rotation.x += 0.005;
+			//	torus.rotation.y += 0.005;
+
+				renderer.render(scene, camera);
+			};
+
+			render();
+		</script>
+	</body>
+</html>
