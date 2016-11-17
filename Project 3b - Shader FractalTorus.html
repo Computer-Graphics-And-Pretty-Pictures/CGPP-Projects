@@ -1,6 +1,6 @@
 <html>
 	<head>
-		<title>I love CGPP</title>
+		<title>LSD Shader</title>
 	</head>
 	<body>
 		<script src="js/three.js"></script>
@@ -47,6 +47,11 @@
 			}
 
 			void main() {
+
+				/* A simple fractal from 
+				* https://www.shadertoy.com/view/Mss3Wf
+				*/
+
 				//normalize stuff
 				vec2 uv = vec2(width, height);
 				uv=-.5*(pos.xy * 600.0)/uv.x;

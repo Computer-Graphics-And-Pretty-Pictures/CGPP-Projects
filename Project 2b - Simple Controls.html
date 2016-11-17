@@ -1,6 +1,6 @@
 <html>
 	<head>
-		<title>I love CGPP</title>
+		<title>Simple Controls</title>
 	</head>
 	<body>
 		<script src="js/three.js"></script>
@@ -9,9 +9,6 @@
 		var camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 1000 );
 
 		var renderer = new THREE.WebGLRenderer();
-
-
-
 
 		var group;
 		var mouseX = 0, mouseY = 0;
@@ -24,8 +21,8 @@
 
 		function init() {
 			group = new THREE.Group();
-			var geometry = new THREE.TorusKnotBufferGeometry(10, 3, 200, 48);
-			var material = new THREE.MeshStandardMaterial({color: 0x550000, metalness:  0.2});
+			var geometry = new THREE.IcosahedronBufferGeometry(10, 0);
+			var material = new THREE.MeshStandardMaterial({color: 0x550000, metalness:  0.2, shading: THREE.FlatShading});
 
 			material.roughness = 0.3;
 			for ( var i = 0; i < 10000; i ++ ) {
@@ -74,8 +71,8 @@
 			var rx = Math.sin( time * 0.7 ) * 0.5,
 				ry = Math.sin( time * 0.3 ) * 0.5,
 				rz = Math.sin( time * 0.2 ) * 0.5;
-			camera.position.x += ( mouseX - camera.position.x ) * .05;
-			camera.position.y += ( - mouseY - camera.position.y ) * .05;
+			camera.position.x += ( mouseX - camera.position.x ) * .01;
+			camera.position.y += ( - mouseY - camera.position.y ) * .01;
 			camera.lookAt( scene.position );
 			group.rotation.x = rx;
 			group.rotation.y = ry;
