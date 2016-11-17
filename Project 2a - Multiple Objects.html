@@ -23,9 +23,11 @@
 
 			var geometry = new THREE.BoxGeometry( 3, 3, 3);
 
+			// Create Objects in a loop
 			for (var i = 0; i < gridDimension; i++ ) {
 				for (var j = 0; j < gridDimension; j++) {
-					var material = new THREE.MeshStandardMaterial( { color: 0x33aaee } );
+					var material = new THREE.MeshStandardMaterial( { 
+						color: new THREE.Color( Math.random(), Math.random(), Math.random()) } );
 					var box = new THREE.Mesh( geometry, material );
 					box.position.x = (i-halfgrid) * 5;
 					box.position.y = (j-halfgrid) * 5;
@@ -33,11 +35,9 @@
 				}
 			}
 
-
 			var pointLight = new THREE.PointLight(0xdddddd, 0.5);
 			scene.add(pointLight);
 			pointLight.position.z = 12;
-
 
 			var hemisphereLight = new THREE.HemisphereLight(0x8899cc, 0x334455);
 			scene.add(hemisphereLight);
@@ -46,10 +46,8 @@
 				requestAnimationFrame( render );
 
 				for (var i = 0; i < scene.children.length; i++ ) {
-					scene.children[i].rotation.x = 0.01;
+					scene.children[i].rotation.x += 0.01;
 				}
-			//	torus.rotation.x += 0.005;
-			//	torus.rotation.y += 0.005;
 
 				renderer.render(scene, camera);
 			};
