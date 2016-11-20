@@ -33,7 +33,6 @@
 		<script src="js/three.js"></script>
 
 		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
 		
 		<script src="js/Mirror.js"></script>
 		<script src="js/WaterShader.js"></script>
@@ -67,11 +66,7 @@
 			
 			void main() {		
 			
-				//gl_FragColor = vec4(0.8, sin( time * gl_FragCoord.x ), cos( time * gl_FragCoord.y ), 1.0);
-			
 				vec3 pointLight = vec3( 3.0 * cos(5.0 * 20.0 * time), 2.5 * sin(5.0 * 20.0 * time), 3.0);
-				
-				
 				
 				vec3 lightRay = normalize(pointLight - pos);
 			
@@ -95,7 +90,6 @@
 		var displacement, noise;
 		init();
 		animate();
-		//var texLoad = new THREE.TextureLoader();
 		function init() {
 			camera = new THREE.PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 1, 10000 );
 			camera.position.z = 300;
@@ -103,21 +97,15 @@
 			
 			uniforms = {
 				amplitude: { value: 1.0 },
-				//color:     { value: new THREE.Color( 0xff2200 ) },
-				//texture:   { value: new THREE.TextureLoader().load( "textures/water.jpg" ) },
-				
-				//texture1:   { value:  texLoad.load( "textures/lava/cloud.png" ) },
 				texture:   { value:  new THREE.TextureLoader().load( "textures/lava/lavatile.jpg" ) },
 			};
 			uniforms.texture.value.wrapS = uniforms.texture.value.wrapT = THREE.RepeatWrapping;
-			//uniforms.texture.value.wrapS = uniforms.texture2.value.wrapT = THREE.RepeatWrapping;
 			var shaderMaterial = new THREE.ShaderMaterial( {
 				uniforms: uniforms,
 				vertexShader:document.getElementById( 'vertexshader' ).textContent,
 				fragmentShader: document.getElementById( 'frag' ).textContent
 			});
 			var radius = 50, segments = 256, rings = 64;
-			//var geometry = new THREE.SphereBufferGeometry( radius, segments, rings );
 			var geometry = new THREE.TorusKnotBufferGeometry( radius, 10, segments, rings );
 			displacement = new Float32Array( geometry.attributes.position.count );
 			noise = new Float32Array( geometry.attributes.position.count );
@@ -134,47 +122,24 @@
 			
 			
 			waterNormals = new THREE.TextureLoader().load( 'textures/waternormals.jpg' );
-				waterNormals.wrapS = waterNormals.wrapT = THREE.RepeatWrapping;
+			waterNormals.wrapS = waterNormals.wrapT = THREE.RepeatWrapping;
 
-				water = new THREE.Water( renderer, camera, scene, {
-					textureWidth: 512,
-					textureHeight: 512,
-					waterNormals: waterNormals,
-					alpha: 	1.0,
-					//sunDirection: pointLight.position.clone().normalize(),
-					sunColor: 0xffffff,
-					waterColor: 0x001e0f,
-					side: THREE.BackSide,
-					distortionScale: 50.0
-				} );
+			water = new THREE.Water( renderer, camera, scene, {
+				textureWidth: 512,
+				textureHeight: 512,
+				waterNormals: waterNormals,
+				alpha: 	1.0,
+				sunColor: 0xffffff,
+				waterColor: 0x00FFFF,
+				side: THREE.BackSide,
+				distortionScale: 50.0
+			} );
 			
-			
-			
-			
-			
-			
-			
-			var geom = new THREE.SphereBufferGeometry( radius * 3.5, segments, rings );
-			//var geom = new THREE.BoxGeometry( 150, 150, 150 );
-				//var materialPhong = new THREE.MeshPhongMaterial( { shininess: 50, color: 0xffffff, specular: 0x999999, map: textureLava } );
-				
-					var mat = new THREE.MeshPhongMaterial( {
-					//color: new THREE.Color("rgb( 51, 51, 0)"),
-					//shininess: 50, //color: 0xffffff, 
-					//specular: 0x999999,
-					//texture:   { value: new THREE.TextureLoader().load( "textures/water.jpg" ) },
-					side: THREE.BackSide,
-					//map: textureLava
-					//vertexShader:document.getElementById( 'vertexshader' ).textContent,
-				//fragmentShader: document.getElementById( 'frag' ).textContent
-				} );
+			var geom = new THREE.SphereBufferGeometry( radius * 3.2, segments, rings );
 			var mesh = new THREE.Mesh( geom, water.material );
 				mesh.position.y = 10;
 				
 				scene.add( mesh );
-			
-			
-			
 			
 			renderer = new THREE.WebGLRenderer();
 			renderer.setClearColor( 0x050505 );
@@ -182,9 +147,6 @@
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			var container = document.getElementById( 'container' );
 			container.appendChild( renderer.domElement );
-			//stats = new Stats();
-			//container.appendChild( stats.dom );
-			//
 			window.addEventListener( 'resize', onWindowResize, false );
 		}
 		function onWindowResize() {
@@ -195,13 +157,11 @@
 		function animate() {
 			requestAnimationFrame( animate );
 			render();
-			//stats.update();
 		}
 		function render() {
 			var time = Date.now() * 0.02;
 			sphere.rotation.y = sphere.rotation.z = 0.005 * time;
 			uniforms.amplitude.value = 2 * Math.sin( sphere.rotation.y * 0.125 );
-			//uniforms.color.value.offsetHSL( 0.0005, 0, 0 );
 			for ( var i = 0; i < displacement.length; i ++ ) {
 				displacement[ i ] = Math.sin( 0.5 * i + time );
 				noise[ i ] += 0.5 * ( 0.5 - Math.random() );
@@ -212,7 +172,7 @@
 			
 			water.material.uniforms.time.value += 1.0 / 30.0;
 				
-				water.render();
+			water.render();
 			
 			renderer.render( scene, camera );
 		}
