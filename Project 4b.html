@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - geometry hierarchy 2</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background:#fff;
+				padding:0;
+				margin:0;
+				font-weight: bold;
+				overflow:hidden;
+			}
+		</style>
+	</head>
+	<body>
+
+		<script src="js/three.js"></script>
+		<script src="js/stats.min.js"></script>
+		<script src="js/dat.gui.min.js"></script>
+		<script src="js/dat.gui.min.js"></script>
+		
+		<script src="js/EffectComposer.js"></script>
+		<script src="js/ShaderPass.js"></script>
+		<script src="js/RenderPass.js"></script>
+		<script src="js/UnrealBloomPass.js"></script>
+		<script src="js/LuminosityHighPassShader.js"></script>
+		<script src="js/CopyShader.js"></script>
+		
+		
+
+		<script>
+			document.body.style.cursor = 'none';
+			var container, stats;
+			var camera, scene, renderer;
+			var geometry, root;
+			var mouseX = 0, mouseY = 0;
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
+
+			var params = {
+				time:0.00005, 
+				xRot:0.00001, 
+				yRot:0.00001, 
+				zRot:0.00001, 
+				animateX:false, 
+				animateY:false, 
+				animateZ: false,
+				reset: function() {
+					this.xRot=0;
+					this.yRot=0;
+					this.zRot=0;
+				},
+				exposure: 0.4,
+				bloomStrength: 0.4,
+				bloomThreshold: 0.85,
+				bloomRadius: 0.64};
+
+			var count = 0, cubeCamera1, cubeCamera2;
+			var material;
+
+			//postprocessing
+			var bloomPass, composer, renderScene;
+
+			var gui = new dat.GUI();
+			var pi = 3.1415926582/4.0;
+			gui.add( params, "time",-0.00005, 0.00005);
+			gui.add( params, "xRot",-pi, pi).listen();
+			gui.add( params, "yRot", -pi, pi).listen();
+			gui.add( params, "zRot", -pi, pi).listen();
+			gui.add( params, "animateX");
+			gui.add( params, "animateY");
+			gui.add( params, "animateZ");
+			gui.add( params, "reset").listen();
+
+			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+			init();
+			animate();
+			function init() {
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 15000 );
+				camera.position.z = 500;
+				scene = new THREE.Scene();
+
+				cubeCamera1 = new THREE.CubeCamera( 1, 1000, 256 );
+				cubeCamera1.renderTarget.texture.minFilter = THREE.LinearMipMapLinearFilter;
+				scene.add( cubeCamera1 );
+				cubeCamera2 = new THREE.CubeCamera( 1, 1000, 256 );
+				cubeCamera2.renderTarget.texture.minFilter = THREE.LinearMipMapLinearFilter;
+				scene.add( cubeCamera2 );
+
+				material = new THREE.MeshStandardMaterial
+
+				var geometry = new THREE.SphereGeometry( 50, 20, 20 );
+
+				root = new THREE.Mesh( geometry, material );
+				root.position.x = -1000;
+				var light = new THREE.PointLight( {color: 0x004455});
+				scene.add( root, light );
+				var amount = 30, object, parent = root;
+				generatePlane(geometry, material, amount, object, parent, 1, 100);
+				generatePlane(geometry, material, amount, object, parent, 0, -100);
+				generatePlane(geometry, material, amount, object, parent, 1, -100);
+				generatePlane(geometry, material, amount, object, parent, 0, 100);
+
+				parent = root;
+				renderer = new THREE.WebGLRenderer();
+				renderer.setClearColor( 0xffffff );
+				renderer.autoClear = false;
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.sortObjects = false;
+				container.appendChild( renderer.domElement );
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				//postprocessing
+				var copyShader = new THREE.ShaderPass(THREE.CopyShader);
+				copyShader.renderToScreen = true;
+				renderScene = new THREE.RenderPass(scene, camera);
+				bloomPass = new THREE.UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);//1.0, 9, 0.5, 512);
+				bloomPass.strength = params.bloomStrength;
+				composer = new THREE.EffectComposer(renderer);
+			    composer.setSize(window.innerWidth, window.innerHeight);
+			    composer.addPass(renderScene);
+				
+			    composer.addPass(bloomPass);
+			    composer.addPass(copyShader);
+			    renderer.gammaInput = true;
+				renderer.gammaOutput = true;
+
+				gui.add( params, 'exposure', 0.1, 2 );
+				gui.add( params, 'bloomThreshold', 0.0, 1.0 ).onChange( function(value) {
+			        bloomPass.threshold = Number(value);
+			    });
+				gui.add( params, 'bloomStrength', 0.0, 3.0 ).onChange( function(value) {
+			        bloomPass.strength = Number(value);
+			    });
+				gui.add( params, 'bloomRadius', 0.0, 1.0 ).onChange( function(value) {
+			        bloomPass.radius = Number(value);
+			    });
+
+				window.addEventListener( 'resize', onWindowResize, false );
+			}
+
+			function generatePlane(geometry, material, amount, object, parent, direction, z) {
+				for ( var i = 0; i < amount; i ++ ) {
+					for (var j = 0; j < amount; j ++) { 
+						object = new THREE.Mesh( geometry, material );
+						if (i%2 == direction) {
+							object.position.x = 100;
+						} else {
+							object.position.x = -100;
+						}
+						parent.add( object );
+						parent = object;
+					}
+					object = new THREE.Mesh( geometry, material );
+					object.position.z = z;
+					parent.add( object );
+					parent = object;
+				}				
+			}
+			function onWindowResize() {
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				composer.setSize( window.innerWidth, window.innerHeight )
+				renderer.setSize( window.innerWidth, window.innerHeight );
+			}
+			function onDocumentMouseMove(event) {
+				mouseX = ( event.clientX - windowHalfX ) * 10;
+				mouseY = ( event.clientY - windowHalfY ) * 10;
+			}
+			
+			function animate() {
+				requestAnimationFrame( animate );
+				render();
+				stats.update();
+			}
+			function render() {
+				var time = Date.now() * 0.00005;
+				var rx = Math.sin( mouseX/window.innerWidth * 0.7 ) * 0.2;
+				var ry = Math.sin( time * 0.3 ) * 0.1;
+				var rz = Math.sin( mouseY/window.innerHeight * 0.2 ) * 0.1;
+				camera.position.x += ( mouseX - camera.position.x ) * .05;
+				camera.position.y += ( - mouseY - camera.position.y ) * .05;
+				camera.lookAt( scene.position );
+				if(params.animateX) {
+					params.xRot += params.time;
+				}
+				if(params.animateY) {
+					params.yRot += params.time;
+				}
+				if(params.animateZ) {
+					params.zRot += params.time;
+				}
+				root.traverse( function ( object ) {
+					object.rotation.x = params.xRot;
+					object.rotation.y = params.yRot;
+					object.rotation.z = params.zRot;
+				} );
+				if ( count % 2 === 0 ) {
+					material.envMap = cubeCamera1.renderTarget.texture;
+					cubeCamera2.updateCubeMap( renderer, scene );
+				} else {
+					material.envMap = cubeCamera2.renderTarget.texture;
+					cubeCamera1.updateCubeMap( renderer, scene );
+				}
+				count ++;
+				renderer.toneMappingExposure = Math.pow( params.exposure, 4.0 );
+				composer.render();
+
+			}
+		</script>
+
+	</body>
+</html>
