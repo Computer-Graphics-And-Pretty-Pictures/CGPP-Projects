@@ -1,0 +1,140 @@
+<html>
+	<head>
+		<title>Starbucks ThreeJs Visualization Project</title>
+		<style>
+			body { margin: 0; background:#cbcbcb;}
+			canvas { width: 100%; height: 100% }
+		</style>
+	</head>
+	<body>
+		<script src="js/three.js"></script>
+		<script src="js/OrbitControls.js"></script>
+		<script src="js/OBJLoader.js"></script>
+		<script>
+			var cup;
+      //create scene
+      var scene = new THREE.Scene();
+      //create the camera
+			camera = new THREE.PerspectiveCamera(	36, window.innerWidth / window.innerHeight, 0.5, 500 );
+			camera.position.set( 4, 4, 6 );
+			scene.add( new THREE.AmbientLight( 0x505050 ) );
+					var spotLight = new THREE.SpotLight( 0xffffff );
+					spotLight.angle = Math.PI / 5;
+					spotLight.penumbra = 0.2;
+					spotLight.position.set( 3, 4, 4 );
+					spotLight.castShadow = true;
+					spotLight.shadow.camera.near = 3;
+					spotLight.shadow.camera.far = 10;
+					spotLight.shadow.mapSize.width = 1024;
+					spotLight.shadow.mapSize.height = 1024;
+					scene.add( spotLight );
+					var dirLight = new THREE.DirectionalLight( 0x55505a, 1 );
+					dirLight.position.set( 0, 4, 0 );
+					dirLight.castShadow = true;
+					dirLight.shadow.camera.near = 1;
+					dirLight.shadow.camera.far = 10;
+					dirLight.shadow.camera.right = 1;
+					dirLight.shadow.camera.left = - 1;
+					dirLight.shadow.camera.top	= 1;
+					dirLight.shadow.camera.bottom = - 1;
+					dirLight.shadow.mapSize.width = 1024;
+					dirLight.shadow.mapSize.height = 1024;
+					scene.add( dirLight );
+				var renderer = new THREE.WebGLRenderer({antialias:true});
+	      renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.shadowMap.enabled = true;
+				document.body.appendChild( renderer.domElement );
+				//Controls
+				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, 1, 0 );
+				controls.update();
+				//Loader
+				var manager = new THREE.LoadingManager();
+				var texture = new THREE.Texture();
+				var bumpTex = new THREE.Texture();
+				var floorText = new THREE.Texture();
+				var loader = new THREE.ImageLoader( manager );
+				loader.load( 'textures/starbucks/sb3.jpg', function ( image ) {
+					texture.anisotropy = renderer.maxAnisotropy;
+					texture.wrapS = THREE.RepeatWrapping;
+					texture.wrapT = THREE.RepeatWrapping;
+					texture.image = image;
+					texture.needsUpdate = true;
+				} );
+				var loader = new THREE.ImageLoader( manager );
+				loader.load( 'textures/starbucks/bumpmap.jpg', function ( image ) {
+					bumpTex.anisotropy = 16;//renderer.maxAnisotropy;
+					bumpTex.repeat.set(0.1,0.1);
+					bumpTex.wrapS = THREE.RepeatWrapping;
+					bumpTex.wrapT = THREE.RepeatWrapping;
+					bumpTex.image = image;
+					bumpTex.needsUpdate = true;
+				} );
+				var loader = new THREE.ImageLoader( manager );
+				loader.load( 'textures/starbucks/wood.jpg', function ( image ) {
+					floorText.anisotropy = renderer.maxAnisotropy;
+					floorText.wrapS = THREE.RepeatWrapping;
+					floorText.wrapT = THREE.RepeatWrapping;
+					floorText.image = image;
+					floorText.needsUpdate = true;
+				} );
+				var ground = new THREE.Mesh(
+							new THREE.PlaneBufferGeometry( 9, 9, 1, 1 ),
+							new THREE.MeshPhongMaterial( {
+								color: 0xcbcbcb, shininess: 150,side: THREE.DoubleSide } ) );
+					ground.rotation.x = - Math.PI / 2;
+					ground.receiveShadow = true;
+					ground.material.map = floorText;
+					scene.add( ground );
+				var loader = new THREE.OBJLoader(manager);
+				loader.load( 'textures/starbucks/sb.obj', function ( object ) {
+					object.scale.set(0.019, 0.019, 0.019);
+					object.position.y = .0;
+					object.castShadow = true;
+					object.rotation.y += Math.PI - .8;
+					object.receiveShadow = true;
+					console.log(object);
+					object.children[3].material.map = texture;
+					object.children[3].material.bumpScale = .005;
+					object.children[3].material.bumpMap = bumpTex;
+					object.children[2].material.shininess = 10;
+					object.children[3].castShadow = true;
+					object.children[0].visible = false;
+					cup=object;
+					scene.add( cup);
+				});
+				var sphere = new THREE.SphereGeometry( 0.05, 16, 8 );
+				var group = new THREE.Object3D();
+				for(var i = 0; i < 10; i++) {
+					light1 = new THREE.PointLight( 0xf4f5be, 2, .5 );
+					light1.add( new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xf4f5be } ) ) );
+					//light1.position = new THREE.Vector3(Math.cos(i / (10 / (2 * Math.PI))), 10, Math.sin(i / (10 / (2 * Math.PI))) );
+					light1.position .x =  Math.cos(i/ (10 / (2 * Math.PI)));
+					light1.position .y = 2;
+					light1.position .z =  Math.sin(i / (10 / (2 * Math.PI))) ;
+					light1.castShadow = true;
+					group.add( light1 );
+				}
+				scene.add(group);
+				console.log(group);
+				var x = false;
+      var render = function () {
+        requestAnimationFrame( render );
+				var time = Date.now() * 0.0005;
+				group.rotation.y +=  -.075;
+				group.position.y = Math.sin(time * 2) * -2;
+				if(cup != null) {
+					cup.rotation.y += .005;
+				}
+        //choose the scene you want to render
+        renderer.render(scene, camera);
+      };
+			function onWindowResize() {
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+			}
+      render();
+		</script>
+	</body>
+</html>
