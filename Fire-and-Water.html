@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>Something Cool</title>
+		<title>Fire and Water</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -21,6 +21,21 @@
 				top: 0px; width: 100%;
 				padding: 5px;
 				z-index:100;
+			}
+
+			#button {
+				position: fixed;
+				bottom: 20px;
+				right: 20px;
+				padding: 8px;
+				color: #fff;
+				background-color: #555;
+				opacity: 0.7;
+			}
+
+			#button:hover {
+				cursor: pointer;
+				opacity: 1;
 			}
 		</style>
 	</head>
@@ -83,6 +98,18 @@
 
 
 		<script>
+
+		var button = document.createElement( 'div' );
+		button.id = 'button';
+		button.textContent = 'View source';
+		button.addEventListener( 'click', function ( event ) {
+
+			window.open( 'https://github.com/PWhiddy/CGPP-Projects/blob/master/Fire%20and%20Water.html' );
+
+		}, false );
+		button.style.display = '';
+		document.body.appendChild( button );
+			
 		if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 		var renderer, scene, camera, stats;
 		var sphere, uniforms;

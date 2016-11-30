@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - geometry hierarchy 2</title>
+		<title>Hierarchy Rotation</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -19,7 +19,6 @@
 		<script src="js/three.js"></script>
 		<script src="js/stats.min.js"></script>
 		<script src="js/dat.gui.min.js"></script>
-		<script src="js/dat.gui.min.js"></script>
 		
 		<script src="js/EffectComposer.js"></script>
 		<script src="js/ShaderPass.js"></script>
@@ -31,7 +30,9 @@
 		
 
 		<script>
-			document.body.style.cursor = 'none';
+
+		// @author torinmb, PWhiddy
+			//document.body.style.cursor = 'none';
 			var container, stats;
 			var camera, scene, renderer;
 			var geometry, root;
@@ -71,7 +72,7 @@
 			gui.add( params, "zRot", -pi, pi).listen();
 			gui.add( params, "animateX");
 			gui.add( params, "animateY");
-			gui.add( params, "animateZ");
+			gui.add( params, "animateZ").listen();
 			gui.add( params, "reset").listen();
 
 			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
@@ -182,6 +183,7 @@
 				stats.update();
 			}
 			function render() {
+
 				var time = Date.now() * 0.00005;
 				var rx = Math.sin( mouseX/window.innerWidth * 0.7 ) * 0.2;
 				var ry = Math.sin( time * 0.3 ) * 0.1;
@@ -203,6 +205,11 @@
 					object.rotation.y = params.yRot;
 					object.rotation.z = params.zRot;
 				} );
+
+				if (count === 150) {
+					params.animateZ = true;
+				}
+
 				if ( count % 2 === 0 ) {
 					material.envMap = cubeCamera1.renderTarget.texture;
 					cubeCamera2.updateCubeMap( renderer, scene );

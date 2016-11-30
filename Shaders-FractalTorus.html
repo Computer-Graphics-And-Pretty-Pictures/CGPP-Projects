@@ -80,6 +80,9 @@
 		
 		</script>		
 		<script>
+
+		// @authors torinmb, PWhiddy
+
 		var scene = new THREE.Scene();
 		var camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 1000 );
 
@@ -152,7 +155,7 @@
 		function onDocumentMouseMove(event) {
 			mouseX = ( event.clientX - windowHalfX ) * 10;
 			mouseY = ( event.clientY - windowHalfY ) * 10;
-			console.log(mouseX + " " + mouseY);
+			//console.log(mouseX + " " + mouseY);
 		}
 
 		function animate() {
