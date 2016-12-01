@@ -18,15 +18,21 @@
 
 		<script id="vertexShader" type="x-shader/x-vertex">
 
+			uniform float time;
+
 			attribute vec4 color;
 
 			varying vec4 vColor;
+			varying vec3 pos;
 
 			void main()	{
 
 				vColor = color;
+				pos = position;
 
-				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+				vec3 newPos = vec3(position.x, position.y * sin(2.0*position.x + 0.2*time), position.z);
+
+				gl_Position = projectionMatrix * modelViewMatrix * vec4( newPos, 1.0 );
 
 			}
 
@@ -37,10 +43,13 @@
 			uniform float time;
 
 			varying vec4 vColor;
+			varying vec3 pos;
 
 			void main()	{
 
 				vec4 color = vec4( vColor );
+				color.r = cos(time*2.0);
+				color.g = sin(pos.y*30.0);
 
 				gl_FragColor = color;
 
@@ -64,7 +73,7 @@
 
 				// geometry
 
-				var triangles = 3;
+				var triangles = 1500;
 
 				var geometry = new THREE.BufferGeometry();
 
@@ -72,9 +81,9 @@
 
 				for ( var i = 0, l = triangles * 3 * 3; i < l; i += 3 ) {
 
-					vertices[ i     ] = 0;
-					vertices[ i + 1 ] = 0;
-					vertices[ i + 2 ] = 0;
+					vertices[ i     ] = Math.random() - 0.5;
+					vertices[ i + 1 ] = Math.random() - 0.5;
+					vertices[ i + 2 ] = Math.random() - 0.5;
 
 				}
 
@@ -84,10 +93,10 @@
 
 				for ( var i = 0, l = triangles * 3 * 4; i < l; i += 4 ) {
 
-					colors[ i     ] = 0;
-					colors[ i + 1 ] = 0;
-					colors[ i + 2 ] = 0;
-					colors[ i + 3 ] = 0;
+					colors[ i     ] = Math.random() * 255;
+					colors[ i + 1 ] = Math.random() * 255;
+					colors[ i + 2 ] = Math.random() * 255;
+					colors[ i + 3 ] = Math.random() * 255;
 
 				}
 
@@ -125,7 +134,7 @@
 
 				var time = performance.now();
 
-				mesh.rotation.y = time * 0.0005;
+				mesh.rotation.y += 0.01;
 				mesh.material.uniforms.time.value = time * 0.005;
 
 				renderer.render( scene, camera );
