@@ -1,6 +1,6 @@
 @charset "UTF-8";
 @import url(font-awesome.min.css);
-@import url("http://fonts.googleapis.com/css?family=Source+Sans+Pro:200");
+@import url("https://fonts.googleapis.com/css?family=Source+Sans+Pro:200");
 
 /*
 	Visualize by TEMPLATED
@@ -8,8 +8,9 @@
 	Released for free under the Creative Commons Attribution 3.0 license (templated.co/license)
 */
 
-/*#more-button{width: 100%; }
-*/
+
+#more-button{width: 30%; }
+
 /*
 #more-button:hover {
     background-color: #FF6382; 
@@ -1615,9 +1616,11 @@
 		}
 
 	hr {
+		margin-left: 0%;
+    	margin-right:  0%;
 		border: 0;
 		border-bottom: solid 1px rgba(255, 255, 255, 0.25);
-		margin: 2em 0;
+		margin: 3em 0;
 	}
 
 		hr.major {
