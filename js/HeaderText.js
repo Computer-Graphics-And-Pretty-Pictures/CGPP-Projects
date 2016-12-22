@@ -202,7 +202,7 @@ function render() {
 	time += 0.008;
 
 	textMeshes.rotation.x = 0.0002*document.body.scrollTop; 
-	textMeshes.position.y = 0.15*document.body.scrollTop; 
+	textMeshes.position.y = 0.07*document.body.scrollTop; 
 	textMeshes.traverse( function(current) {
 		if (current.type === 'Mesh') {
 
