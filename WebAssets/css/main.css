@@ -8,6 +8,31 @@
 	Released for free under the Creative Commons Attribution 3.0 license (templated.co/license)
 */
 
+/*#more-button{width: 100%; }
+*/
+/*
+#more-button:hover {
+    background-color: #FF6382; 
+    color: white;
+}
+*/
+
+#viewS{width: 100%;}
+
+#grow input:checked{color:red;}
+
+#more-button:hover{color:black;}
+
+#grow {
+    -moz-transition: height .5s;
+    -ms-transition: height .5s;
+    -o-transition: height .5s;
+    -webkit-transition: height .5s;
+    transition: height .5s;
+    height: 0;
+    overflow: hidden;
+  }
+
 /* Reset */
 
 	html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video {
@@ -1685,7 +1710,7 @@
 		input[type="tel"]:focus,
 		select:focus,
 		textarea:focus {
-			border-color: #FF6382;
+			border-color: #FF6382; /* #FF6382*/
 			box-shadow: 0 0 0 1px #FF6382;
 		}
 
@@ -2214,6 +2239,7 @@
 		-ms-transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
 		transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
 		background-color: #FF6382;
+		opacity: 0.3
 		border-radius: 4px;
 		border: 0;
 		color: !important;
@@ -2325,7 +2351,7 @@
 		input[type="button"].special,
 		button.special,
 		.button.special {
-			background-color: #FF6382;
+			background-color: #FF6382; /* #FF6382 */ 
 			color: !important;
 		}
 

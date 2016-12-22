@@ -4,6 +4,17 @@
 	Released for free under the Creative Commons Attribution 3.0 license (templated.co/license)
 */
 
+function growDiv() {
+    var growDiv = document.getElementById('grow');
+    if (growDiv.clientHeight) {
+      growDiv.style.height = 0;
+    } else {
+      var wrapper = document.querySelector('.measuringWrapper');
+      growDiv.style.height = wrapper.clientHeight + "px";
+    }
+//document.getElementById("more-button").value=document.getElementById("more-button").value=='Read more'?'Read less':'Read more';
+}
+
 $(function() {
 
 	// Vars.
@@ -27,6 +38,8 @@ $(function() {
 		$window.on('load', function() {
 			$body.removeClass('is-loading');
 		});
+
+
 
 	// Poptrox.
 		$window.on('load', function() {
