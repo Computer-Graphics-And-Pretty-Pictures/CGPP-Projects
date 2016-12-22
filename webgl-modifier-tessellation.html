@@ -202,10 +202,9 @@
 			//
 
 			mesh = new THREE.Mesh( geometry, shaderMaterial );
-			var scl = window.innerWidth > window.innerHeight ? window.innerWidth : window.innerHeight;
-			mesh.scale.x = scl/1500.0;
-			mesh.scale.y = scl/1500.0;
-			mesh.scale.z = scl/1500.0;
+			mesh.scale.x = window.innerWidth/1500.0;
+			mesh.scale.y = window.innerWidth/1500.0;
+			mesh.scale.z = window.innerWidth/1500.0;
 
 			scene.add( mesh );
 
@@ -228,11 +227,9 @@
 
 			camera.aspect = window.innerWidth / window.innerHeight;
 			camera.updateProjectionMatrix();
-			var scl = window.innerWidth > window.innerHeight ? window.innerWidth : window.innerHeight;
-			mesh.scale.x = scl/1500.0;
-			mesh.scale.y = scl/1500.0;
-			mesh.scale.z = scl/1500.0;
-
+			mesh.scale.x = window.innerWidth/1500.0;
+			mesh.scale.y = window.innerWidth/1500.0;
+			mesh.scale.z = window.innerWidth/1500.0;
 
 			renderer.setSize( window.innerWidth, window.innerHeight );
 
