@@ -1,7 +1,7 @@
 var renderer, scene, camera;
 var time = 500.0;
 
-var mesh, uniforms;
+var mesh, textMeshes, uniforms, scaleForMobile;
 
 var WIDTH = window.innerWidth,
 	HEIGHT = window.innerHeight;
@@ -25,11 +25,70 @@ function init( font ) {
 
 	//
 
-	var geometry = new THREE.TextGeometry( "Pretty Pictures", {
+	var positions;
+	if (window.innerWidth > window.innerHeight) {
+		positions = [ -120, 18,  -120, -18,  5,  120, 18, 120, -18];
+		scaleForMobile = 1.0;
+	} else {
+		positions = [ 0, 85,  0, 50,  0,  0, -50, 0, -85];
+		scaleForMobile = 3.0;
+	}
+	
+
+	textMeshes = new THREE.Object3D();
+
+	mesh = createText( "Computer", font );
+	mesh.position.x = positions[0];
+	mesh.position.y = positions[1];
+	textMeshes.add( mesh );
+
+	mesh = createText( "Graphics", font );
+	mesh.position.x = positions[2];
+	mesh.position.y = positions[3];
+	textMeshes.add( mesh );
+
+	mesh = createText( "&", font );
+	mesh.position.x = positions[4];
+	textMeshes.add( mesh );
+
+	mesh = createText( "Pretty", font );
+	mesh.position.x = positions[5];
+	mesh.position.y = positions[6];
+	textMeshes.add( mesh );
+
+	mesh = createText( "Pictures", font );
+	mesh.position.x = positions[7];
+	mesh.position.y = positions[8];
+	textMeshes.add( mesh );
+
+	textMeshes.scale.x = scaleForMobile*window.innerWidth/1500.0;
+	textMeshes.scale.y = scaleForMobile*window.innerWidth/1500.0;
+	textMeshes.scale.z = scaleForMobile*window.innerWidth/1500.0;
+
+	scene.add( textMeshes );
+
+	renderer = new THREE.WebGLRenderer( { antialias: true } );
+	renderer.setClearColor( 0x050505 );
+	renderer.setPixelRatio( window.devicePixelRatio );
+	renderer.setSize( WIDTH, HEIGHT );
+
+	var container = document.getElementById( 'container' );
+	container.appendChild( renderer.domElement );
+
+
+	//
+
+	window.addEventListener( 'resize', onWindowResize, false );
+
+}
+
+function createText( text, font ) {
+
+var geometry = new THREE.TextGeometry( text, {
 
 		font: font,
 
-		size: 40,
+		size: 28,
 		height: 5,
 		curveSegments: 7,
 
@@ -115,35 +174,16 @@ function init( font ) {
 
 	mesh = new THREE.Mesh( geometry, shaderMaterial );
 
-	mesh.scale.x = window.innerWidth/1500.0;
-	mesh.scale.y = window.innerWidth/1500.0;
-	mesh.scale.z = window.innerWidth/1500.0;
-
-	scene.add( mesh );
-
-	renderer = new THREE.WebGLRenderer( { antialias: true } );
-	renderer.setClearColor( 0x050505 );
-	renderer.setPixelRatio( window.devicePixelRatio );
-	renderer.setSize( WIDTH, HEIGHT );
-
-	var container = document.getElementById( 'container' );
-	container.appendChild( renderer.domElement );
-
-
-	//
-
-	window.addEventListener( 'resize', onWindowResize, false );
-
+	return mesh;
 }
 
 function onWindowResize() {
 
 	camera.aspect = window.innerWidth / (window.innerHeight);
 	camera.updateProjectionMatrix();
-	mesh.scale.x = window.innerWidth/1500.0;
-	mesh.scale.y = window.innerWidth/1500.0;
-	mesh.scale.z = window.innerWidth/1500.0;
-
+	textMeshes.scale.x = scaleForMobile*window.innerWidth/1500.0;
+	textMeshes.scale.y = scaleForMobile*window.innerWidth/1500.0;
+	textMeshes.scale.z = scaleForMobile*window.innerWidth/1500.0;
 
 	renderer.setSize( window.innerWidth, window.innerHeight );
 
@@ -161,10 +201,17 @@ function render() {
 
 	time += 0.008;
 
-	mesh.rotation.x = 0.0002*document.body.scrollTop; 
-	mesh.position.y = 0.15*document.body.scrollTop; 
-	uniforms.amplitude.value = 0.08*document.body.scrollTop; //1.0 + Math.sin( time * 0.5 );
-	uniforms.gTime.value = time;
+	textMeshes.rotation.x = 0.0002*document.body.scrollTop; 
+	textMeshes.position.y = 0.15*document.body.scrollTop; 
+	textMeshes.traverse( function(current) {
+		if (current.type === 'Mesh') {
+
+			current.material.uniforms.amplitude.value = 0.08*document.body.scrollTop; //1.0 + Math.sin( time * 0.5 );
+			current.material.uniforms.gTime.value = time;
+		}
+		
+	} );
+
 
 //	controls.update();
 
