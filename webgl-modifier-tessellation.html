@@ -36,7 +36,6 @@
 
 		<script src="js/ExplodeModifier.js"></script>
 		<script src="js/TessellateModifier.js"></script>
-		<script src="js/SharpSans.js"></script>
 
 		<script type="x-shader/x-vertex" id="vertexshader">
 
@@ -78,7 +77,7 @@
 
 				float directional = max( dot( vNormal, light ), 0.0 );
 
-				gl_FragColor = vec4( mix(vec3(1.0),vColor, amplitude*(0.5+0.5*sin(gTime+vColor.r*10.0+vColor.b*8.47))), 1.0 );
+				gl_FragColor = vec4( mix(vec3(1.0),vColor, amplitude*(0.5+0.5*sin(gTime*vColor.r*3.3+vColor.b*8.47))), 1.0 );
 
 			}
 
@@ -88,7 +87,7 @@
 		<script>
 
 		var renderer, scene, camera;
-		var time = 0.0;
+		var time = 500.0;
 
 		var mesh, uniforms;
 
@@ -120,7 +119,7 @@
 
 				size: 40,
 				height: 5,
-				curveSegments: 10,
+				curveSegments: 7,
 
 				bevelThickness: 2,
 				bevelSize: 1,
@@ -130,7 +129,7 @@
 
 			geometry.center();
 
-			var tessellateModifier = new THREE.TessellateModifier( 25 );
+			var tessellateModifier = new THREE.TessellateModifier( 12 );
 
 			for ( var i = 0; i < 6; i ++ ) {
 
@@ -203,10 +202,10 @@
 			//
 
 			mesh = new THREE.Mesh( geometry, shaderMaterial );
-			var scl = window.innerWidth > window.innerHeight ? window.innerWidth : window.innerHeight;
-			mesh.scale.x = scl/1500.0;
-			mesh.scale.y = scl/1500.0;
-			mesh.scale.z = scl/1500.0;
+	
+			mesh.scale.x = window.innerWidth/1500.0;
+			mesh.scale.y = window.innerWidth/1500.0;
+			mesh.scale.z = window.innerWidth/1500.0;
 
 			scene.add( mesh );
 
@@ -227,12 +226,11 @@
 
 		function onWindowResize() {
 
-			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.aspect = window.innerWidth / (window.innerHeight);
 			camera.updateProjectionMatrix();
-			var scl = window.innerWidth > window.innerHeight ? window.innerWidth : window.innerHeight;
-			mesh.scale.x = scl/1500.0;
-			mesh.scale.y = scl/1500.0;
-			mesh.scale.z = scl/1500.0;
+			mesh.scale.x = window.innerWidth/1500.0;
+			mesh.scale.y = window.innerWidth/1500.0;
+			mesh.scale.z = window.innerWidth/1500.0;
 
 
 			renderer.setSize( window.innerWidth, window.innerHeight );
@@ -252,7 +250,7 @@
 			time += 0.008;
 
 			mesh.rotation.x = 0.001*document.body.scrollTop; 
-			uniforms.amplitude.value = 0.01*document.body.scrollTop; //1.0 + Math.sin( time * 0.5 );
+			uniforms.amplitude.value = 0.08*document.body.scrollTop; //1.0 + Math.sin( time * 0.5 );
 			uniforms.gTime.value = time;
 
 		//	controls.update();
@@ -263,6 +261,72 @@
 
 
 	</script>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
 	<br/>
 	<br/>
 	<br/>
