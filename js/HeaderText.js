@@ -41,9 +41,9 @@ function init( font ) {
 
 	geometry.center();
 
-	var tessellateModifier = new THREE.TessellateModifier( 12 );
+	var tessellateModifier = new THREE.TessellateModifier( 500 );
 
-	for ( var i = 0; i < 6; i ++ ) {
+	for ( var i = 0; i < 8; i ++ ) {
 
 		tessellateModifier.modify( geometry );
 
@@ -161,7 +161,8 @@ function render() {
 
 	time += 0.008;
 
-	mesh.rotation.x = 0.001*document.body.scrollTop; 
+	mesh.rotation.x = 0.0002*document.body.scrollTop; 
+	mesh.position.y = 0.15*document.body.scrollTop; 
 	uniforms.amplitude.value = 0.08*document.body.scrollTop; //1.0 + Math.sin( time * 0.5 );
 	uniforms.gTime.value = time;
 
