@@ -2644,6 +2644,8 @@
 		margin-top: 80vh;
 	}
 
+
+
 /* Header */
 
 	#header {
@@ -2700,3 +2702,7 @@
 			}
 
 		}
+
+	#main, #footer {
+		position: relative;
+	}	
