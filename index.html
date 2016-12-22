@@ -12,9 +12,60 @@ CGPP - UW 2016
 		<link rel="stylesheet" href="WebAssets/css/main.css" />
 	</head>
 	<body>
+		<script src="js/three.js"></script>
+		<script src="js/ExplodeModifier.js"></script>
+		<script src="js/TessellateModifier.js"></script>
+		<script type="x-shader/x-vertex" id="vertexshader">
 
+			uniform float amplitude;
+			uniform float gTime;
+
+			attribute vec3 customColor;
+			attribute vec3 displacement;
+
+			varying vec3 vNormal;
+			varying vec3 vColor;
+
+			void main() {
+
+				vNormal = normal;
+				vColor = customColor;
+
+				vec3 newPosition = position + normal * amplitude * displacement;
+				gl_Position = projectionMatrix * modelViewMatrix * vec4( newPosition, 1.0 );
+
+			}
+
+		</script>
+
+		<script type="x-shader/x-fragment" id="fragmentshader">
+
+			varying vec3 vNormal;
+			varying vec3 vColor;
+
+			uniform float amplitude;
+			uniform float gTime;
+
+			void main() {
+
+				const float ambient = 0.4;
+
+				vec3 light = vec3( 1.0 );
+				light = normalize( light );
+
+				float directional = max( dot( vNormal, light ), 0.0 );
+
+				gl_FragColor = vec4( mix(vec3(1.0),vColor, amplitude*(0.5+0.5*sin(gTime*vColor.r*3.3+vColor.b*8.47))), 1.0 );
+
+			}
+		</script>
+		<script src="js/HeaderText.js"></script>
+
+	<div id="container"></div>
+	<div id="headerspacer"></div>
 		<!-- Wrapper -->
 			<div id="wrapper">
+
 
 				<!-- Header -->
 					<header id="header">
@@ -33,6 +84,7 @@ CGPP - UW 2016
 						  <!--
 						  <h2><a href=https://github.com/PWhiddy/CGPP-Projects>Github Repository</a></h2> -->
 					</header>
+
 
 				<!-- Main -->
 					<section id="main">
