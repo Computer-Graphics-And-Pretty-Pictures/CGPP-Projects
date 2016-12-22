@@ -36,6 +36,7 @@
 
 		<script src="js/ExplodeModifier.js"></script>
 		<script src="js/TessellateModifier.js"></script>
+		<script src="js/SharpSans.js"></script>
 
 		<script type="x-shader/x-vertex" id="vertexshader">
 
@@ -95,7 +96,7 @@
 			HEIGHT = window.innerHeight;
 
 		var loader = new THREE.FontLoader();
-		loader.load( 'WebAssets/fonts/helvetiker_bold.typeface.json', function ( font ) {
+		loader.load( 'WebAssets/fonts/SharpSansNo1Medium_Regular.json', function ( font ) {
 
 			init( font );
 			animate();
@@ -119,7 +120,7 @@
 
 				size: 40,
 				height: 5,
-				curveSegments: 3,
+				curveSegments: 10,
 
 				bevelThickness: 2,
 				bevelSize: 1,
