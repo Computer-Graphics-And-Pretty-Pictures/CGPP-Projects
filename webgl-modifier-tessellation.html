@@ -77,7 +77,7 @@
 
 				float directional = max( dot( vNormal, light ), 0.0 );
 
-				gl_FragColor = vec4( ( directional + ambient ) * mix(vec3(1.0),vColor, amplitude*(0.5+0.5*sin(gTime+vColor.r*10.0+vColor.b*8.47))), 1.0 );
+				gl_FragColor = vec4( mix(vec3(1.0),vColor, amplitude*(0.5+0.5*sin(gTime+vColor.r*10.0+vColor.b*8.47))), 1.0 );
 
 			}
 
@@ -104,8 +104,8 @@
 
 		function init( font ) {
 
-			camera = new THREE.PerspectiveCamera( 40, WIDTH / HEIGHT, 1, 10000 );
-			camera.position.set( -0, 0, 400 );
+			camera = new THREE.PerspectiveCamera( 20, WIDTH / HEIGHT, 1, 10000 );
+			camera.position.set( -0, 0, 800 );
 
 		//	controls = new THREE.TrackballControls( camera );
 
