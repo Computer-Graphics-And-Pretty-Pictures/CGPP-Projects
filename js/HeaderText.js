@@ -41,9 +41,9 @@ function init( font ) {
 
 	geometry.center();
 
-	var tessellateModifier = new THREE.TessellateModifier( 500 );
+	var tessellateModifier = new THREE.TessellateModifier( 12 );
 
-	for ( var i = 0; i < 8; i ++ ) {
+	for ( var i = 0; i < 15; i ++ ) {
 
 		tessellateModifier.modify( geometry );
 
