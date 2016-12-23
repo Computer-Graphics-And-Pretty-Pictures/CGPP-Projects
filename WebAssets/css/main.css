@@ -2248,7 +2248,7 @@
 		-webkit-transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
 		-ms-transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
 		transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
-		background-color: rgba(26, 131, 171, 0.6);
+		background-color: rgba(255, 255, 255, 0.048);
 		opacity: 0.3
 		border-radius: 4px;
 		border: 0;
@@ -2269,7 +2269,7 @@
 		input[type="button"]:hover,
 		button:hover,
 		.button:hover {
-			background-color: rgba(0, 171, 236, 0.72);
+			background-color: rgba(255, 255, 255, 0.08);
 		}
 
 		input[type="submit"]:active,
@@ -2455,7 +2455,7 @@
 
 			.thumbnails a:hover {
 				background-color: rgba(255, 255, 255, 0.25);
-				box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.25), 0 0 0.5em 0 #5952ad;
+				box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.25), 0 0 0.5em 0 #30226d;
 			}
 
 		.thumbnails > div {
