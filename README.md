@@ -33,7 +33,7 @@ Many more examples like these can be found [here](https://threejs.org/examples)
 
 [Paul Lewis](https://aerotwist.com)
 
-[Ricardo Cabello](mrdoob.com)
+[Ricardo Cabello](http://mrdoob.com)
 
 [Adam Harley](http://scs.ryerson.ca/~aharley/vis/conv/)
 
