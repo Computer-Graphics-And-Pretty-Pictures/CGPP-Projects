@@ -6,7 +6,7 @@ Here you will find WebGL projects made with [three.js](https://threejs.org/)
 
 Many more examples like these can be found [here](https://threejs.org/examples)
   
-#A couple good beginner tutorials:
+#A few good beginner tutorials:
 
 [Create a rotating box and load a model file](https://dinosaurscode.xyz/tutorials/2016/07/15/three-js-tutorial-for-beginners/)
 
