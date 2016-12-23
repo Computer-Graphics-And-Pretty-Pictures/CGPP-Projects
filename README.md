@@ -6,7 +6,7 @@ Here you will find WebGL projects made with [three.js](https://threejs.org/)
 
 Many more examples like these can be found [here](https://threejs.org/examples)
   
-Here's a couple good beginner tutorials:
+#Here's a couple good beginner tutorials:
 
 [Create a rotating box and load a model file](https://dinosaurscode.xyz/tutorials/2016/07/15/three-js-tutorial-for-beginners/)
 
@@ -15,7 +15,7 @@ Here's a couple good beginner tutorials:
 [Interactive site demoing 3D graphics concepts](http://www.dimroc.com/reveal.js-threejs/)
 
 
-Some cool personal sites and blogs:
+#Some cool personal sites and blogs:
 
 [Jaume Sanchez](https://www.clicktorelease.com/)
 
@@ -38,14 +38,14 @@ Some cool personal sites and blogs:
 [Chistopher Morre](http://christopheremoore.net/home.lua)
 
 
-Advanced (Math and Graphics API heavy) resources: 
+#Advanced (Math and Graphics API heavy) resources: 
 
 [GPU Gems 3](https://developer.nvidia.com/gpugems/GPUGems3/gpugems3_pref01.html)
 
 [Inigo Quilez Articles](http://www.iquilezles.org/www/index.htm)
 
 
-Graphics programming communities: 
+#Graphics programming communities: 
 
 [ShaderToy](https://www.shadertoy.com/)
 
