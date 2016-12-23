@@ -15,7 +15,7 @@ Many more examples like these can be found [here](https://threejs.org/examples)
 [Interactive site demoing 3D graphics concepts](http://www.dimroc.com/reveal.js-threejs/)
 
 
-#Cool personal sites and blogs:
+#Cool personal sites, blogs, and twitter accounts:
 
 [Jaume Sanchez](https://www.clicktorelease.com/)
 
@@ -25,7 +25,7 @@ Many more examples like these can be found [here](https://threejs.org/examples)
 
 [Evan Wallace](http://madebyevan.com/)
 
-[Daniel Johnson](http://www.hexahedria.com/experiments/)
+[Benedikt Bitterli](https://benedikt-bitterli.me/)
 
 [Jessica Mak](https://twitter.com/mango_lychee)
 
@@ -33,11 +33,19 @@ Many more examples like these can be found [here](https://threejs.org/examples)
 
 [Paul Lewis](https://aerotwist.com)
 
+[George Corney](https://twitter.com/haxiomic)
+
+[Daniel Johnson](http://www.hexahedria.com/experiments/)
+
 [Ricardo Cabello](http://mrdoob.com)
+
+[Florian Bosch](https://twitter.com/pyalot)
 
 [Adam Harley](http://scs.ryerson.ca/~aharley/vis/conv/)
 
 [Chistopher Morre](http://christopheremoore.net/home.lua)
+
+[Felix Woitzel](https://twitter.com/flexi23)
 
 
 #Advanced (Math and Graphics API heavy) resources: 
