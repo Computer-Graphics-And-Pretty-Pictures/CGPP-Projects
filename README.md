@@ -21,6 +21,8 @@ Many more examples like these can be found [here](https://threejs.org/examples)
 
 [David Li](http://david.li)
 
+[Steve Wittens](https://acko.net/)
+
 [AlteredQualia](http://alteredqualia.com/)
 
 [Evan Wallace](http://madebyevan.com/)
