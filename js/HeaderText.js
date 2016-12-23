@@ -201,12 +201,14 @@ function render() {
 
 	time += 0.008;
 
-	textMeshes.rotation.x = 0.0002*document.body.scrollTop; 
-	textMeshes.position.y = 0.07*document.body.scrollTop; 
+	var scrollPos = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+
+	textMeshes.rotation.x = 0.0002*scrollPos; 
+	textMeshes.position.y = 0.07*scrollPos; 
 	textMeshes.traverse( function(current) {
 		if (current.type === 'Mesh') {
 
-			current.material.uniforms.amplitude.value = 0.08*document.body.scrollTop; //1.0 + Math.sin( time * 0.5 );
+			current.material.uniforms.amplitude.value = 0.08*scrollPos; //1.0 + Math.sin( time * 0.5 );
 			current.material.uniforms.gTime.value = time;
 		}
 		
