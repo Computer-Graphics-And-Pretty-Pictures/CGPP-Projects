@@ -6,7 +6,7 @@ Here you will find WebGL projects made with [three.js](https://threejs.org/)
 
 Many more examples like these can be found [here](https://threejs.org/examples)
   
-#Here's a couple good beginner tutorials:
+#A couple good beginner tutorials:
 
 [Create a rotating box and load a model file](https://dinosaurscode.xyz/tutorials/2016/07/15/three-js-tutorial-for-beginners/)
 
@@ -15,11 +15,13 @@ Many more examples like these can be found [here](https://threejs.org/examples)
 [Interactive site demoing 3D graphics concepts](http://www.dimroc.com/reveal.js-threejs/)
 
 
-#Some cool personal sites and blogs:
+#Cool personal sites and blogs:
 
 [Jaume Sanchez](https://www.clicktorelease.com/)
 
-[David Li](david.li)
+[David Li](http://david.li)
+
+[AlteredQualia](http://alteredqualia.com/)
 
 [Evan Wallace](http://madebyevan.com/)
 
@@ -42,10 +44,12 @@ Many more examples like these can be found [here](https://threejs.org/examples)
 
 [GPU Gems 3](https://developer.nvidia.com/gpugems/GPUGems3/gpugems3_pref01.html)
 
+[Udacity Course](https://www.udacity.com/course/interactive-3d-graphics--cs291)
+
 [Inigo Quilez Articles](http://www.iquilezles.org/www/index.htm)
 
 
-#Graphics programming communities: 
+#Communities: 
 
 [ShaderToy](https://www.shadertoy.com/)
 
