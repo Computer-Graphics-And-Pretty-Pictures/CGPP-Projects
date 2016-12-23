@@ -8,45 +8,46 @@ Many more examples like these can be found [here](https://threejs.org/examples)
   
 Here's a couple good beginner tutorials:
 
-	[Create a rotating box and load a model file](https://dinosaurscode.xyz/tutorials/2016/07/15/three-js-tutorial-for-beginners/)
+[Create a rotating box and load a model file](https://dinosaurscode.xyz/tutorials/2016/07/15/three-js-tutorial-for-beginners/)
 
-	[A nice intro to threejs](https://aerotwist.com/tutorials/getting-started-with-three-js/)
+[A nice intro to threejs](https://aerotwist.com/tutorials/getting-started-with-three-js/)
 
-	[Interactive site demoing 3D graphics concepts](http://www.dimroc.com/reveal.js-threejs/)
+[Interactive site demoing 3D graphics concepts](http://www.dimroc.com/reveal.js-threejs/)
 
 
 Some cool personal sites and blogs:
 
-	[Jaume Sanchez](https://www.clicktorelease.com/)
-	[David Li](david.li)
+[Jaume Sanchez](https://www.clicktorelease.com/)
 
-	[Evan Wallace](http://madebyevan.com/)
+[David Li](david.li)
 
-	[Daniel Johnson](http://www.hexahedria.com/experiments/)
+[Evan Wallace](http://madebyevan.com/)
 
-	[Jessica Mak](https://twitter.com/mango_lychee)
+[Daniel Johnson](http://www.hexahedria.com/experiments/)
 
-	[Inigo Quilez](http://www.iquilezles.org/)
+[Jessica Mak](https://twitter.com/mango_lychee)
 
-	[Paul Lewis](https://aerotwist.com)
+[Inigo Quilez](http://www.iquilezles.org/)
 
-	[Ricardo Cabello](mrdoob.com)
+[Paul Lewis](https://aerotwist.com)
 
-	[Adam Harley](http://scs.ryerson.ca/~aharley/vis/conv/)
+[Ricardo Cabello](mrdoob.com)
 
-	[Chistopher Morre](http://christopheremoore.net/home.lua)
+[Adam Harley](http://scs.ryerson.ca/~aharley/vis/conv/)
+
+[Chistopher Morre](http://christopheremoore.net/home.lua)
 
 
 Advanced (Math and Graphics API heavy) resources: 
 
-	[GPU Gems 3](https://developer.nvidia.com/gpugems/GPUGems3/gpugems3_pref01.html)
+[GPU Gems 3](https://developer.nvidia.com/gpugems/GPUGems3/gpugems3_pref01.html)
 
-	[Inigo Quilez Articles](http://www.iquilezles.org/www/index.htm)
+[Inigo Quilez Articles](http://www.iquilezles.org/www/index.htm)
 
 
 Graphics programming communities: 
 
-  [ShaderToy](https://www.shadertoy.com/)
+[ShaderToy](https://www.shadertoy.com/)
 
-  [OpenProcessing](https://www.openprocessing.org/)
+[OpenProcessing](https://www.openprocessing.org/)
   
