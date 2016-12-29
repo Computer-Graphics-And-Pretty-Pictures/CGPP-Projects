@@ -54,7 +54,7 @@ Many more examples like these can be found [here](https://threejs.org/examples)
 
 [GPU Gems 3](https://developer.nvidia.com/gpugems/GPUGems3/gpugems3_pref01.html)
 
-[The Book of Shaders (Amazing walkthrough of fragment shaders)](https://thebookofshaders.com/)
+[The Book of Shaders (Walkthrough of fragment shaders)](https://thebookofshaders.com/)
 
 [Udacity Course](https://www.udacity.com/course/interactive-3d-graphics--cs291)
 
