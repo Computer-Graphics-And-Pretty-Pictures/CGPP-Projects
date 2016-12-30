@@ -45,6 +45,8 @@ Many more examples like these can be found [here](https://threejs.org/examples)
 
 [Adam Harley](http://scs.ryerson.ca/~aharley/vis/conv/)
 
+[Jonas Degrave](https://317070.github.io/)
+
 [Chistopher Morre](http://christopheremoore.net/home.lua)
 
 [Felix Woitzel](https://twitter.com/flexi23)
