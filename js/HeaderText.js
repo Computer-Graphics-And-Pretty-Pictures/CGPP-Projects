@@ -205,8 +205,8 @@ function render() {
 
 	var scrollExact = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
 	var scrollDif = scrollPos - scrollExact;
-	
-	scrollPos -= 0.1 * scrollDif;
+	scrollVel += 0.2 * scrollDif
+	scrollPos -= 0.3 * srollVel;
 
 	textMeshes.rotation.x = 0.0002*scrollPos; 
 	textMeshes.position.y = 0.07*scrollPos; 
