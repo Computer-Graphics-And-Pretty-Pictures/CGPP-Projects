@@ -1,6 +1,7 @@
 var renderer, scene, camera;
 var time = 500.0;
 var scrollPos = 0.0;
+var scrollVel = 0.0;
 
 var mesh, textMeshes, uniforms, scaleForMobile;
 
@@ -202,8 +203,10 @@ function render() {
 
 	time += 0.008;
 
-	scrollPos = 0.8*scrollPos + 0.2 *
-	(window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0);
+	var scrollExact = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+	var scrollDif = scrollPos - scrollExact;
+	
+	scrollPos += 0.1 * scrollDif;
 
 	textMeshes.rotation.x = 0.0002*scrollPos; 
 	textMeshes.position.y = 0.07*scrollPos; 
