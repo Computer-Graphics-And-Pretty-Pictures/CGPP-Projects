@@ -2,7 +2,7 @@
 
 Welcome to the CGPP code repository!
 
-Here you will find WebGL projects made with [three.js](https://threejs.org/)
+Here you will find projects made with [three.js](https://threejs.org/)
 
 Many more examples like these can be found [here](https://threejs.org/examples)
   
