@@ -204,14 +204,14 @@ function render() {
 	time += 0.008;
 
 	var scrollExact = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
-	var scrollDif = scrollPos - scrollExact;
-	scrollVel += 0.3 * scrollDif;
-	scrollVel *= 0.7;
-	if (window.innerWidth < window.innerHeight) {
+	//var scrollDif = scrollPos - scrollExact;
+	//scrollVel += 0.3 * scrollDif;
+	//scrollVel *= 0.7;
+	//if (window.innerWidth < window.innerHeight) {
 		scrollPos = scrollExact;	
-	} else {
-		scrollPos -= 0.3 * scrollVel;	
-	}
+	//} else {
+	//	scrollPos -= 0.3 * scrollVel;	
+	//}
 
 	textMeshes.rotation.x = 0.0002*scrollPos; 
 	textMeshes.position.y = 0.07*scrollPos; 
