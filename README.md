@@ -37,6 +37,8 @@ Many more examples like these can be found [here](https://threejs.org/examples)
 
 [Paul Lewis](https://aerotwist.com)
 
+[Samsy](http://samsy.ninja/)
+
 [George Corney](https://twitter.com/haxiomic)
 
 [Daniel Johnson](http://www.hexahedria.com/experiments/)
@@ -44,6 +46,8 @@ Many more examples like these can be found [here](https://threejs.org/examples)
 [Ricardo Cabello](http://mrdoob.com)
 
 [Florian Bosch](https://twitter.com/pyalot)
+
+[Justin Windle](https://soulwire.co.uk/)
 
 [Adam Harley](http://scs.ryerson.ca/~aharley/vis/conv/)
 
