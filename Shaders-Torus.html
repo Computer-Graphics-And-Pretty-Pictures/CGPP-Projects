@@ -12,6 +12,7 @@
 	<body>
 	
 		<script src="js/three.js"></script>
+		<script src="js/OrbitControls.js"></script>
 		
 		<script id="vert" type="shader">
 		
@@ -71,7 +72,7 @@
 
 			// @author PWhiddy
 		
-			var camera, scene, renderer, shaderMat, cubey;
+			var camera, scene, renderer, shaderMat, cubey, controls;
 		
 			initialize();
 			
@@ -88,6 +89,10 @@
 				renderer.setSize( window.innerWidth, window.innerHeight ); 
 				
 				document.body.appendChild( renderer.domElement );
+
+				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.enableDamping = true;
+				controls.dampingFactor = 0.25;
 				
 				var geo = new THREE.TorusGeometry( 1, 0.5, 150, 300);
 				geo.computeFaceNormals();
@@ -106,7 +111,7 @@
 				
 				var material = new THREE.MeshBasicMaterial( { map: map, side: THREE.DoubleSide } );
 				shaderMat = new THREE.ShaderMaterial( {
-					uniforms: { time: { type: "f", value: 2.235 },
+					uniforms: { time: { type: "f", value: 2.36 },
 								 tex: { type: "t", value: map }
 							   },
 					vertexShader: document.getElementById( 'vert' ).textContent,
@@ -126,6 +131,7 @@
 			
 			function render() {
 				requestAnimationFrame( render );
+				controls.update();
 				cubey.rotation.z += 0.0002;
 				cubey.rotation.x += 0.0025;
 				cubey.rotation.y += 0.0001;

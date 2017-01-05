@@ -98,17 +98,6 @@
 
 
 		<script>
-
-		var button = document.createElement( 'div' );
-		button.id = 'button';
-		button.textContent = 'View source';
-		button.addEventListener( 'click', function ( event ) {
-
-			window.open( 'https://github.com/PWhiddy/CGPP-Projects/blob/master/Fire%20and%20Water.html' );
-
-		}, false );
-		button.style.display = '';
-		document.body.appendChild( button );
 			
 		if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 		var renderer, scene, camera, stats;

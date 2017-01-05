@@ -9,18 +9,24 @@
 	</head>
 	<body>
 		<script src="js/three.js"></script>
+		<script src="js/OrbitControls.js"></script>
 		<script>
 
 			// @author torinmb, PWhiddy
-
+			var controls;
 			var scene = new THREE.Scene();
 			var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
 			camera.position.z = 30;
 
+
 			var renderer = new THREE.WebGLRenderer({antialias:true});
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			document.body.appendChild( renderer.domElement );
-
+			
+			controls = new THREE.OrbitControls( camera, renderer.domElement );
+			controls.enableDamping = true;
+			controls.dampingFactor = 0.25;
+			controls.minDistance = 35;
 			var gridDimension = 10;
 			var halfgrid = gridDimension / 2;
 
@@ -29,12 +35,17 @@
 			// Create Objects in a loop
 			for (var i = 0; i < gridDimension; i++ ) {
 				for (var j = 0; j < gridDimension; j++) {
-					var material = new THREE.MeshStandardMaterial( { 
-						color: new THREE.Color( Math.random(), Math.random(), Math.random()) } );
-					var box = new THREE.Mesh( geometry, material );
-					box.position.x = (i-halfgrid) * 5;
-					box.position.y = (j-halfgrid) * 5;
-					scene.add( box );
+					for (var k = 0; k < gridDimension; k++) {
+						var material = new THREE.MeshStandardMaterial( { 
+							color: new THREE.Color( Math.random(), Math.random(), Math.random()) } );
+						var box = new THREE.Mesh( geometry, material );
+						
+
+						box.position.x = (i-halfgrid) * 5;
+						box.position.y = (j-halfgrid) * 5;
+						box.position.z = (k-halfgrid) * 5;
+						scene.add( box );
+					}
 				}
 			}
 
@@ -47,6 +58,7 @@
 			
 			var render = function () {
 				requestAnimationFrame( render );
+				controls.update();
 
 				for (var i = 0; i < scene.children.length; i++ ) {
 					scene.children[i].rotation.x += 0.01;

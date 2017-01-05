@@ -9,13 +9,14 @@
 	</head>
 	<body>
 		<script src="js/three.js"></script>
+		<script src="js/OrbitControls.js"></script>
 		<script>
 
 		// @author torinmb, PWhiddy
-
+		var scene, camera, renderer, controls;
 		var scene = new THREE.Scene();
 		var camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 1000 );
-
+		var controls;
 		var renderer = new THREE.WebGLRenderer();
 
 		var group;
@@ -28,6 +29,13 @@
 		animate();
 
 		function init() {
+			scene = new THREE.Scene();
+			camera = new THREE.PerspectiveCamera( 50, window.innerWidth /window.innerHeight, 0.1, 1000 );
+			renderer = new THREE.WebGLRenderer();
+			controls = new THREE.OrbitControls( camera, renderer.domElement );
+			controls.enableDamping = true;
+			controls.dampingFactor = 0.25;	
+			controls.minDistance = 10;		
 			group = new THREE.Group();
 			var geometry = new THREE.IcosahedronBufferGeometry(10, 0);
 			var material = new THREE.MeshStandardMaterial({color: 0x550000, metalness:  0.2, shading: THREE.FlatShading});
@@ -48,19 +56,12 @@
 		
 		var light = new THREE.AmbientLight( {color: 0xffffff} );
 		var light2 = new THREE.PointLight( {color: 0x004455});
-		// light.position.y = 50;
+
 		scene.add(light, light2, group);
-
-
-		// var mesh = new THREE.Mesh(geometry, material);
 
 		var renerer = new THREE.WebGLRenderer();
 		renderer.sortObjects = false;
-		// renderer.setClearColor( 0xffffff );
-
 		renderer.setSize(window.innerWidth, window.innerHeight);
-
-		// scene.add( mesh );
 		document.body.appendChild( renderer.domElement);
 		camera.position.z = 10;
 
@@ -79,8 +80,7 @@
 			var rx = Math.sin( time * 0.7 ) * 0.5,
 				ry = Math.sin( time * 0.3 ) * 0.5,
 				rz = Math.sin( time * 0.2 ) * 0.5;
-			camera.position.x += ( mouseX - camera.position.x ) * .01;
-			camera.position.y += ( - mouseY - camera.position.y ) * .01;
+			controls.update();				
 			camera.lookAt( scene.position );
 			group.rotation.x = rx;
 			group.rotation.y = ry;

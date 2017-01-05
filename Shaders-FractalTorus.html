@@ -4,6 +4,7 @@
 	</head>
 	<body>
 		<script src="js/three.js"></script>
+		<script src="js/OrbitControls.js"></script>
 		<script id="vert" type="shader">
 		
 			uniform float time;
@@ -82,14 +83,9 @@
 		<script>
 
 		// @authors torinmb, PWhiddy
+		var scene, camera, renderer, controls;
 
-		var scene = new THREE.Scene();
-		var camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 1000 );
-
-		var renderer = new THREE.WebGLRenderer();
-
-		var group; 
-		var shaderMat;
+		var group, shaderMat;
 		var mouseX = 0, mouseY = 0;
 		var windowHalfX = window.innerWidth / 2;
 		var windowHalfY = window.innerHeight / 2;
@@ -99,9 +95,17 @@
 		animate();
 
 		function init() {
+			scene = new THREE.Scene();
+			camera = camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 1000 );
+			renderer = new THREE.WebGLRenderer();
 			group = new THREE.Group();
 			var geo = new THREE.TorusGeometry( 1, 0.5, 50, 100);
 			geo.computeFaceNormals();
+
+			controls = new THREE.OrbitControls( camera, renderer.domElement );
+			controls.enableDamping = true;
+			controls.dampingFactor = 0.25;
+			controls.minDistance = 10;
 			
 			var dim = 512;
 			var size = dim * dim;
@@ -164,15 +168,11 @@
 		}		
 
 		function render() {
+			controls.update();
 			var time = Date.now() * 0.001;
 			var rx = Math.sin( time * 0.7 ) * 0.5,
 				ry = Math.sin( time * 0.3 ) * 0.5,
 				rz = Math.sin( time * 0.2 ) * 0.5;
-			camera.position.x += (  camera.position.x ) * .05;
-			camera.position.y += (  camera.position.y ) * .05;
-			// replace for mouse controls
-			// camera.position.x += ( mouseX - camera.position.x ) * .05;
-			// camera.position.y += ( - mouseY - camera.position.y ) * .05;
 			camera.lookAt( scene.position );
 			group.rotation.x = rx;
 			group.rotation.y = ry;

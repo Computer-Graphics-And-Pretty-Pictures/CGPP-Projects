@@ -9,6 +9,7 @@
 	</head>
 	<body>
 		<script src="js/three.js"></script>
+		<script src="js/OrbitControls.js"></script>
 		<script>
 
 			// @author PWhiddy
@@ -33,6 +34,11 @@
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			// Attach renderer to DOM element 
 			document.body.appendChild( renderer.domElement );
+
+			// adding orbit controls to allow camera movement
+			var controls = new THREE.OrbitControls( camera, renderer.domElement );
+			controls.enableDamping = true;
+			controls.dampingFactor = 0.25;			
 
 			// Create our objects geometry with built-in torus knot algorithim
 			var geometry = new THREE.TorusKnotGeometry( 10, 3, 192, 96);
@@ -62,7 +68,7 @@
 				// Rendering function is called each time the 
 				// browser requests a new frame
 				requestAnimationFrame( render );
-
+				controls.update();
 				// Rotate our object
 				torus.rotation.x += 0.005;
 				torus.rotation.y += 0.005;
