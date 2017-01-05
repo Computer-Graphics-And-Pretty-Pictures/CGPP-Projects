@@ -60,7 +60,7 @@
 
 		scene.add(light, light2, group);
 
-		var renerer = new THREE.WebGLRenderer();
+		var renerer = new THREE.WebGLRenderer({antialias: true});
 		renderer.sortObjects = false;
 		renderer.setSize(window.innerWidth, window.innerHeight);
 		document.body.appendChild( renderer.domElement);

@@ -148,7 +148,7 @@
 		var light2 = new THREE.PointLight( {color: 0x004455});
 		scene.add(light, light2, group);
 
-		var renerer = new THREE.WebGLRenderer();
+		var renerer = new THREE.WebGLRenderer({antialias: true});
 		renderer.sortObjects = false;
 
 		renderer.setSize(window.innerWidth, window.innerHeight);
