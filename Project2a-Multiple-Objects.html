@@ -17,8 +17,6 @@
 			var scene = new THREE.Scene();
 			var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
 			camera.position.z = 30;
-
-
 			var renderer = new THREE.WebGLRenderer({antialias:true});
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			document.body.appendChild( renderer.domElement );
@@ -26,7 +24,7 @@
 			controls = new THREE.OrbitControls( camera, renderer.domElement );
 			controls.enableDamping = true;
 			controls.dampingFactor = 0.25;
-			controls.minDistance = 35;
+			controls.minDistance = 40;
 			var gridDimension = 10;
 			var halfgrid = gridDimension / 2;
 
@@ -39,8 +37,6 @@
 						var material = new THREE.MeshStandardMaterial( { 
 							color: new THREE.Color( Math.random(), Math.random(), Math.random()) } );
 						var box = new THREE.Mesh( geometry, material );
-						
-
 						box.position.x = (i-halfgrid) * 5;
 						box.position.y = (j-halfgrid) * 5;
 						box.position.z = (k-halfgrid) * 5;
