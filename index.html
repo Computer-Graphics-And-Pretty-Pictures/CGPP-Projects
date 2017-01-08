@@ -65,7 +65,7 @@ CGPP - UW 2016
 
 				float directional = max( dot( vNormal, light ), 0.0 );
 
-				gl_FragColor = vec4( max(0.75,0.15-0.08*amplitude)
+				gl_FragColor = vec4( max(0.75,1.1-0.08*amplitude)
 					*mix(vec3(1.0),vColor, amplitude*(0.5+0.5*sin(gTime*vColor.r*0.5+vColor.b*8.47))), 1.0 );
 
 			}
