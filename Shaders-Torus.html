@@ -94,6 +94,8 @@
 				controls = new THREE.OrbitControls( camera, renderer.domElement );
 				controls.enableDamping = true;
 				controls.dampingFactor = 0.25;
+				controls.zoomSpeed = 0.5;
+				controls.rotateSpeed = 0.5;
 				
 				var geo = new THREE.TorusGeometry( 1, 0.5, 150, 300);
 				geo.computeFaceNormals();

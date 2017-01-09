@@ -36,7 +36,9 @@
 			controls = new THREE.OrbitControls( camera, renderer.domElement );
 			controls.enableDamping = true;
 			controls.dampingFactor = 0.25;	
-			controls.minDistance = 10;		
+			controls.minDistance = 10;
+			controls.zoomSpeed = 0.5;
+			controls.rotateSpeed = 0.5;		
 			group = new THREE.Group();
 			var geometry = new THREE.IcosahedronBufferGeometry(10, 0);
 			var material = new THREE.MeshStandardMaterial({color: 0x550000, metalness:  0.2, shading: THREE.FlatShading});

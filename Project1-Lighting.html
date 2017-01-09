@@ -39,7 +39,9 @@
 			// adding orbit controls to allow camera movement
 			var controls = new THREE.OrbitControls( camera, renderer.domElement );
 			controls.enableDamping = true;
-			controls.dampingFactor = 0.25;			
+			controls.dampingFactor = 0.25;	
+			controls.zoomSpeed = 0.5;
+			controls.rotateSpeed = 0.5;		
 
 			// Create our objects geometry with built-in torus knot algorithim
 			var geometry = new THREE.TorusKnotGeometry( 10, 3, 192, 96);

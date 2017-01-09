@@ -25,6 +25,8 @@
 			controls = new THREE.OrbitControls( camera, renderer.domElement );
 			controls.enableDamping = true;
 			controls.dampingFactor = 0.25;
+			controls.zoomSpeed = 0.5;
+			controls.rotateSpeed = 0.5;
 			// controls.minDistance = 60;
 			var gridDimension = 10;
 			var halfgrid = gridDimension / 2;

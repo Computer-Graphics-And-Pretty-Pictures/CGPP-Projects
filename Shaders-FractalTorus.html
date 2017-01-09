@@ -106,6 +106,8 @@
 			controls.enableDamping = true;
 			controls.dampingFactor = 0.25;
 			controls.minDistance = 10;
+			controls.zoomSpeed = 0.5;
+			controls.rotateSpeed = 0.5;
 			
 			var dim = 512;
 			var size = dim * dim;
@@ -129,12 +131,12 @@
 				vertexShader: document.getElementById( 'vert' ).textContent,
 				fragmentShader: document.getElementById( 'frag' ).textContent
 			} );			
-
-			for ( var i = 0; i < 800; i ++ ) {
+			var distance = 1000;
+			for ( var i = 0; i < 250; i ++ ) {
 				var mesh = new THREE.Mesh( geo, shaderMat );
-				mesh.position.x = Math.random() * 2000 - 1000;
-				mesh.position.y = Math.random() * 2000 - 1000;
-				mesh.position.z = Math.random() * 2000 - 1000;
+				mesh.position.x = Math.random() * distance - distance/2;
+				mesh.position.y = Math.random() * distance - distance/2;
+				mesh.position.z = Math.random() * distance - distance/2;
 				mesh.rotation.x = Math.random() * 2 * Math.PI;
 				mesh.rotation.y = Math.random() * 2 * Math.PI;
 				mesh.scale.set( 70, 70, 70 );

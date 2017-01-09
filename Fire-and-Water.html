@@ -3,7 +3,6 @@
 	<head>
 		<title>Fire and Water</title>
 		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 			body {
 				color: #ffffff;
@@ -50,6 +49,7 @@
 		
 		<script src="js/Mirror.js"></script>
 		<script src="js/WaterShader.js"></script>
+		<script src="js/OrbitControls.js"></script>
 
 		<script type="x-shader/x-vertex" id="vertexshader">
 			uniform float amplitude;
@@ -103,6 +103,7 @@
 		var renderer, scene, camera, stats;
 		var sphere, uniforms;
 		var displacement, noise;
+		var controls;
 		init();
 		animate();
 		function init() {
@@ -158,6 +159,11 @@
 			var container = document.getElementById( 'container' );
 			container.appendChild( renderer.domElement );
 			window.addEventListener( 'resize', onWindowResize, false );
+			controls = new THREE.OrbitControls( camera, renderer.domElement );
+			controls.enableDamping = true;
+			controls.dampingFactor = 0.25;
+			controls.zoomSpeed = 0.5;
+			controls.rotateSpeed = 0.5;
 		}
 		function onWindowResize() {
 			camera.aspect = window.innerWidth / window.innerHeight;
@@ -183,7 +189,7 @@
 			water.material.uniforms.time.value += 1.0 / 30.0;
 				
 			water.render();
-			
+			controls.update();
 			renderer.render( scene, camera );
 		}
 	</script>
