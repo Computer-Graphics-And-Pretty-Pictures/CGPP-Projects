@@ -77,7 +77,6 @@
 
       // Use our geometry and material to create a mesh (What's a mesh? https://en.wikipedia.org/wiki/Polygon_mesh)
       var sphere = new THREE.Mesh( geometry, material );
-      sphere.geometry.dynamic = true;
 
       /* Create a point light source with color 0xdddddd, intesity 0.5 */
       var pointLight = new THREE.PointLight(0xdddddd, 1.0);
@@ -115,10 +114,9 @@
         // Rotate our object
         var size = analyser.getAverageFrequency() *0.01;
         sphere.scale.set(size, size, size);
-        sphere.position.y = size * 80 - 80;
+        sphere.position.y = 0.9 * sphere.position.y + 0.1 * (size * 80 - 80);
 
         sphere.geometry.thetaLength = size* 0.0001;
-        sphere.geometry.verticesNeedUpdate = true;
 
         sphere.rotation.x += 0.005;
         sphere.rotation.y += 0.005;
