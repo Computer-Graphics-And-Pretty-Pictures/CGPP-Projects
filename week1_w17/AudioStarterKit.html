@@ -31,7 +31,8 @@
       * near — Camera near plane. (Objects outside the near and far plane won't be rendered)
       * far — Camera far plane.
       */
-      var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
+      var camera = new THREE.PerspectiveCamera( 75, 
+          window.innerWidth/window.innerHeight, 0.1, 1000 );
       // Move camera back so we are looking at the origin
       camera.position.z = 30;
 
@@ -78,25 +79,21 @@
       // Create our objects geometry with built-in sphere knot algorithim
       var geometry = new THREE.SphereGeometry( 5, 32, 32 );
       // The material properties of our object
-      var material = new THREE.MeshStandardMaterial( { color: 0xFFFFFF, emissive: 0xFFFFFF, emissiveIntensity:1.0 } ); // color is in hexidecimal
+      var material = new THREE.MeshStandardMaterial( { color: 0xFFFFFF, 
+        emissive: 0xFFFFFF, emissiveIntensity:1.0 } ); // color is in hexidecimal
 
       // Use our geometry and material to create a mesh (What's a mesh? https://en.wikipedia.org/wiki/Polygon_mesh)
       var sphere = new THREE.Mesh( geometry, material );
-      sphere.castShadow = true;
-      sphere.recieveShadow = true;
 
       /* Create a point light source with color 0xdddddd, intesity 0.5 */
-      // var pointLight = new THREE.PointLight(0xdddddd, 1.0);
+
       var pointLight = new THREE.PointLight(0xFFFFFF, 1.0);
-      pointLight.castShadow = true;
-      pointLight.shadow.camera.near = 1;
-      pointLight.shadow.camera.far = 1000;
-          // pointLight.shadowCameraVisible = true;
-      pointLight.shadow.bias = 0.01;
+
       sphere.add(pointLight);
 
       function generateRing(count, radius, group) {
-        var material = new THREE.MeshStandardMaterial( { color: 0x33aaee, emissive: 0xFFFFFF, emissiveIntensity:0 } ); // color is in hexidecimal
+        var material = new THREE.MeshStandardMaterial( { color: 0x33aaee, 
+          emissive: 0xFFFFFF, emissiveIntensity:0 } ); // color is in hexidecimal
         for(var i = 0; i < count; i++) {
           var angle = ((1.0 * i) / count ) * Math.PI * 2;
           var x = radius * Math.cos( angle );
@@ -118,10 +115,6 @@
       scene.add(group);
 
 
-      // Adjust light position to nicely illuminate object
-      // pointLight.position.y = 40;
-      // pointLight.position.x = 40;
-      //*/
       // Add mesh to the scene
       scene.add( sphere );
 
@@ -132,7 +125,6 @@
       };
       var matFloor = new THREE.MeshPhongMaterial( matParams );
       var geoFloor = new THREE.BoxGeometry( 2000, 0.1, 2000 );
-      // matFloor.color.set( 0x808080 );
       var mshFloor = new THREE.Mesh( geoFloor, matFloor );
       mshFloor.recieveShadow = true;
       mshFloor.position.y = 0;
@@ -148,15 +140,10 @@
         var size = analyser.getAverageFrequency() *0.01;
         dataArray = analyser.getFrequencyData();
         sphere.scale.set(size*10+5, size*10+5, size*10+5);
-        // if (size < 0.5) {
-        //   pointLight.intensity = 0.0;
-        // } else {
-          
-        // }
+
         pointLight.intensity = size;
         sphere.material.emissiveIntensity = size;
         
-        // sphere.material.emissiveIntensity = size * 0.1;
         sphere.position.y = 0.9 * sphere.position.y + 0.1 * (size * 400 - 50);
 
         sphere.rotation.x += 0.005;
@@ -166,8 +153,7 @@
         group.traverse( function(current) {
           var index = Math.round(current.position.distanceTo(
               new THREE.Vector3(0.0,0.0,0.0)) / (ringRadius * ringCount) * ringCount);
-          // console.log(index);
-          // current.rotation.z += 0.005 * Math.pow(index, 2);
+
           var change = dataArray[index];
           current.position.y = 0.9 * current.position.y + 0.1 * change - 10;
         });
