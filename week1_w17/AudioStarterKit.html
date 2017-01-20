@@ -53,13 +53,18 @@
       });
       
       //Create an AudioAnalyser, passing in the sound and desired fftSize
-      var analyser = new THREE.AudioAnalyser( sound, 32 );
+      var bufferLength = 64;
+      var analyser = new THREE.AudioAnalyser( sound, bufferLength );
+      var dataArray = new Uint8Array(bufferLength);
 
       // The threejs webgl renderer
       var renderer = new THREE.WebGLRenderer({antialias: true});
       // Tell renderer the dimensions of our screen
       renderer.setSize( window.innerWidth, window.innerHeight );
       renderer.setPixelRatio( window.devicePixelRatio );
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
       // Attach renderer to DOM element 
       document.body.appendChild( renderer.domElement );
 
@@ -77,10 +82,38 @@
 
       // Use our geometry and material to create a mesh (What's a mesh? https://en.wikipedia.org/wiki/Polygon_mesh)
       var sphere = new THREE.Mesh( geometry, material );
+      sphere.castShadow = true;
+      sphere.recieveShadow = true;
+      function generateRing(count, radius, group) {
+        for(var i = 0; i < count; i++) {
+          var angle = ((1.0 * i) / count ) * Math.PI * 2;
+          var x = radius * Math.cos( angle );
+          var z = radius * Math.sin( angle );
+          var newSphere = new THREE.Mesh( geometry, material );
+
+          newSphere.position.set(x, -20, z);
+          group.add(newSphere);
+        }
+      }
+      var group = new THREE.Group();
+      group.castShadow = true;
+      group.recieveShadow = true;
+      var ringSize = 20;
+      var ringRadius = 30;
+      for(var i = 0; i < ringSize; i++) {
+        generateRing(Math.pow(i+3, 2), i * ringRadius + ringRadius, group);
+      }
+      scene.add(group);
 
       /* Create a point light source with color 0xdddddd, intesity 0.5 */
       var pointLight = new THREE.PointLight(0xdddddd, 1.0);
+      pointLight.castShadow = true;
+      pointLight.shadow.camera.near = 1;
+      pointLight.shadow.camera.far = 1000;
+          // pointLight.shadowCameraVisible = true;
+      pointLight.shadow.bias = 0.01;
       sphere.add(pointLight);
+
       // Adjust light position to nicely illuminate object
       // pointLight.position.y = 40;
       // pointLight.position.x = 40;
@@ -97,6 +130,7 @@
       var geoFloor = new THREE.BoxGeometry( 2000, 0.1, 2000 );
       // matFloor.color.set( 0x808080 );
       var mshFloor = new THREE.Mesh( geoFloor, matFloor );
+      mshFloor.recieveShadow = true;
       mshFloor.position.y = -20;
       scene.add(mshFloor);
     
@@ -113,13 +147,21 @@
         controls.update();
         // Rotate our object
         var size = analyser.getAverageFrequency() *0.01;
-        sphere.scale.set(size, size, size);
-        sphere.position.y = 0.9 * sphere.position.y + 0.1 * (size * 80 - 80);
-
-        sphere.geometry.thetaLength = size* 0.0001;
+        dataArray = analyser.getFrequencyData();
+        sphere.scale.set(size*2, size*2, size*2);
+        pointLight.intensity = size;
+        // sphere.material.emissiveIntensity = size * 0.1;
+        sphere.position.y = 0.9 * sphere.position.y + 0.1 * (size * 400 - 250);
 
         sphere.rotation.x += 0.005;
         sphere.rotation.y += 0.005;
+
+        group.rotation.y += 0.005;
+        
+        group.traverse( function(current) {
+          var change = dataArray[Math.round(current.position.distanceTo(new THREE.Vector3(0.0,0.0,0.0)) / (ringRadius * ringSize) * dataArray.length)] - 100;
+          current.position.y = 0.98 * current.position.y + 0.02 * change;
+        });
 
         // Render our scene
         renderer.render(scene, camera);
