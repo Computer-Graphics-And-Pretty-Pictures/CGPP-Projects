@@ -95,7 +95,6 @@
       pointLight.shadow.bias = 0.01;
       sphere.add(pointLight);
 
-
       function generateRing(count, radius, group) {
         var material = new THREE.MeshStandardMaterial( { color: 0x33aaee, emissive: 0xFFFFFF, emissiveIntensity:0 } ); // color is in hexidecimal
         for(var i = 0; i < count; i++) {
@@ -111,13 +110,12 @@
       var group = new THREE.Group();
       group.castShadow = true;
       group.recieveShadow = true;
-      var ringSize = 15;
-      var ringRadius = 30;
-      for(var i = 0; i < ringSize; i++) {
+      var ringCount = 8;
+      var ringRadius = 50;
+      for(var i = 0; i < ringCount; i++) {
         generateRing(Math.pow(i+4, 2), i * ringRadius + ringRadius, group);
       }
       scene.add(group);
-
 
 
       // Adjust light position to nicely illuminate object
@@ -137,14 +135,9 @@
       // matFloor.color.set( 0x808080 );
       var mshFloor = new THREE.Mesh( geoFloor, matFloor );
       mshFloor.recieveShadow = true;
-      mshFloor.position.y = -20;
+      mshFloor.position.y = 0;
       scene.add(mshFloor);
     
-      /* Ambient lighting - try disabling one of the lights to see each's contribution */
-      // var hemisphereLight = new THREE.HemisphereLight(0x8899cc, 0x334455);
-      // scene.add(hemisphereLight);
-      //*/
-      
       // Our rendering loop
       var render = function () {
         // Rendering function is called each time the 
@@ -154,27 +147,29 @@
         // Rotate our object
         var size = analyser.getAverageFrequency() *0.01;
         dataArray = analyser.getFrequencyData();
-        sphere.scale.set(size*4, size*4, size*4);
+        sphere.scale.set(size*10+5, size*10+5, size*10+5);
         // if (size < 0.5) {
         //   pointLight.intensity = 0.0;
         // } else {
           
         // }
         pointLight.intensity = size;
+        sphere.material.emissiveIntensity = size;
         
         // sphere.material.emissiveIntensity = size * 0.1;
-        sphere.position.y = 0.9 * sphere.position.y + 0.1 * (size * 400 - 220);
+        sphere.position.y = 0.9 * sphere.position.y + 0.1 * (size * 400 - 50);
 
         sphere.rotation.x += 0.005;
         sphere.rotation.y += 0.005;
 
         group.rotation.y += 0.005;
         group.traverse( function(current) {
-          var index = Math.round(current.position.distanceTo(new THREE.Vector3(0.0,0.0,0.0)) / (ringRadius * ringSize) * ringSize);
+          var index = Math.round(current.position.distanceTo(
+              new THREE.Vector3(0.0,0.0,0.0)) / (ringRadius * ringCount) * ringCount);
           // console.log(index);
           // current.rotation.z += 0.005 * Math.pow(index, 2);
-          var change = dataArray[index] - 150;
-          current.position.y = 0.9 * current.position.y + 0.1 * change;
+          var change = dataArray[index];
+          current.position.y = 0.9 * current.position.y + 0.1 * change - 10;
         });
         // Render our scene
         renderer.render(scene, camera);
