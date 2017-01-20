@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>three.js webgl - geometry hierarchy 2</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <style>
+      canvas { width: 100%; height: 100% }
+      html, body {
+        background:#fff;
+        padding:0;
+        margin:0;
+        font-weight: bold;
+        overflow:hidden;
+      }
+    </style>
+  </head>
+  <body>
+    <script src="../js/three.js"></script>
+    <script src="../js/stats.min.js"></script>
+    <script src="../js/dat.gui.min.js"></script>
+    <script src="../js/OrbitControls.js"></script>
+
+    <script>
+      // A container to place our objects into
+      var scene = new THREE.Scene();
+      /*
+      * PerspectiveCamera( fov, aspect, near, far )
+      * fov — Camera  vertical field of view.
+      * aspect — Camera  aspect ratio.
+      * near — Camera near plane. (Objects outside the near and far plane won't be rendered)
+      * far — Camera far plane.
+      */
+      var camera = new THREE.PerspectiveCamera( 75, 
+          window.innerWidth/window.innerHeight, 0.8, 6000 );
+      // Move camera back so we are looking at the origin
+      camera.position.z = 30;
+
+      //Create an AudioListener and add it to the camera
+      var listener = new THREE.AudioListener();
+      camera.add( listener );
+
+      // create an Audio source
+      var sound = new THREE.Audio( listener );
+
+      var audioLoader = new THREE.AudioLoader();
+      // Alternate Audio '../WebAssets/audio/04 Cabin Sessions (ft_ Exmag & Benny Bloom).mp3'
+      var url = '../WebAssets/audio/ThoseDays.mp3'
+      // Load a sound and set it as the Audio object's buffer
+      audioLoader.load( url , function( buffer ) {
+        sound.setBuffer( buffer );
+        sound.setLoop(true);
+        sound.setVolume(0.5);
+        sound.play();
+      });
+      
+      //Create an AudioAnalyser, passing in the sound and desired fftSize
+      var bufferLength = 512;
+      var analyser = new THREE.AudioAnalyser( sound, bufferLength );
+      var dataArray = new Uint8Array(bufferLength);
+
+      // The threejs webgl renderer
+      var renderer = new THREE.WebGLRenderer({antialias: true});
+      // Tell renderer the dimensions of our screen
+      renderer.setSize( window.innerWidth, window.innerHeight );
+      renderer.setPixelRatio( window.devicePixelRatio );
+
+      // Attach renderer to DOM element 
+      document.body.appendChild( renderer.domElement );
+
+      // adding orbit controls to allow camera movement with the cursor
+      var controls = new THREE.OrbitControls( camera, renderer.domElement );
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.25;  
+      controls.zoomSpeed = 0.5;
+      controls.rotateSpeed = 0.5;   
+
+      // Create our objects geometry with built-in sphere knot algorithim
+      var geometry = new THREE.SphereGeometry( 5, 32, 32 );
+      // The material properties of our object
+      var material = new THREE.MeshStandardMaterial( { color: 0xFFFFFF, 
+        emissive: 0xFFFFFF, emissiveIntensity:1.0 } ); // color is in hexidecimal
+
+      // Use our geometry and material to create a mesh (What's a mesh? https://en.wikipedia.org/wiki/Polygon_mesh)
+      var sphere = new THREE.Mesh( geometry, material );
+
+      /* Create a point light source with color 0xdddddd, intesity 0.5 */
+
+      var pointLight = new THREE.PointLight(0xFFFFFF, 1.0);
+
+      sphere.add(pointLight);
+
+      // Add mesh to the scene
+      scene.add( sphere );
+
+      var matParams = {
+        specular: 0xFFFFFF,
+        shininess: 100,
+        color: 0xFFFFFF
+      };
+      var matFloor = new THREE.MeshPhongMaterial( matParams );
+      var geoFloor = new THREE.BoxGeometry( 4000, 3000, 4000 );
+      var mshFloor = new THREE.Mesh( geoFloor, matFloor );
+      mshFloor.position.y = -1500;
+      scene.add(mshFloor);
+    
+      // Our rendering loop
+      var render = function () {
+        // Rendering function is called each time the 
+        // browser requests a new frame
+        requestAnimationFrame( render );
+        controls.update();
+        // Rotate our object
+        var size = analyser.getAverageFrequency() *0.01;
+        dataArray = analyser.getFrequencyData();
+        sphere.scale.set(size*10+5, size*10+5, size*10+5);
+
+        pointLight.intensity = size;
+        sphere.material.emissiveIntensity = size;
+        
+        sphere.position.y = 0.9 * sphere.position.y + 0.1 * (size * 400 - 50);
+
+        // Render our scene
+        renderer.render(scene, camera);
+      };
+
+      render();
+    </script>
+  </body>
+</html>
