@@ -212,17 +212,17 @@
 				scene = new THREE.Scene();
 
 				params = {
-					sensitivity: 100.0,
-					pointLightIntensity : 0.14,
+					sensitivity: 125.0,
+					pointLightIntensity : 0.15,
 					time : 0.3,
-					noiseIterations : 32.0,
+					noiseIterations : 6.0,
 					sphereSpread : 1000,
-					triangleCount : 45000,
+					triangleCount : 200000,
 					triangleSize : 12
 				};
 				gui = new dat.GUI();
 				var f1 = gui.addFolder('Lights');
-				f1.add( params, "pointLightIntensity", 0.0, 1.0 ).listen();
+				f1.add( params, "pointLightIntensity", 0.0, 0.5 ).listen();
 				var f2 = gui.addFolder('Noise');
 				var f3 = gui.addFolder('Geometry');
 				f2.add( params, "sensitivity", 1.0, 200.0 ).listen();
