@@ -119,10 +119,10 @@
         ringGroup = new THREE.Group();
         ringGroup.castShadow = true;
         ringGroup.recieveShadow = true;
-        var ringCount = 60;
+        var ringCount = 40;
         var ringRadius = 50;
         for(var i = 0; i < ringCount; i++) {
-          ringGroup.add(generateRing(i * 4, i * ringRadius + ringRadius, ringGroup));
+          ringGroup.add(generateRing(i * 3, i * ringRadius + ringRadius, ringGroup));
         }
         scene.add(ringGroup);
 
