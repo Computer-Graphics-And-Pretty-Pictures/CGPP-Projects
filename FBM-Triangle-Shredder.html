@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>FBM Vertex Shader</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				color: #ffffff;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+				font-weight: bold;
+
+				background-color: #000000;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+			}
+
+			a {
+				color: #ffffff;
+			}
+
+			#oldie a { color:#da0 }
+		</style>
+	</head>
+	<body>
+
+		<div id="container"></div>
+		<div id="info"><a href="http://uwc.graphics" target="_blank">CGPP</a> FBM Triangle Shredder</div>
+
+		<script src="js/three.js"></script>
+		<script src="js/dat.gui.min.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/stats.min.js"></script>
+	    <script src="js/OrbitControls.js"></script>
+
+		<script id="vertexShader" type="x-shader/x-vertex">
+
+			precision mediump float;
+			precision mediump int;
+
+			uniform mat4 modelViewMatrix; // optional
+			uniform mat4 projectionMatrix; // optional
+			uniform float time;
+			uniform float audio[32];
+			uniform float sensitivity;
+			uniform float noiseIterations; 
+
+			attribute vec3 position;
+			attribute vec3 normal;
+			attribute vec4 color;
+
+			varying vec3 vPosition;
+			varying vec3 vNormal;
+			varying vec4 vColor;
+
+
+			/// NOISE CODE 
+			//  noise from https://www.shadertoy.com/view/XsX3zB
+		    /* discontinuous pseudorandom uniformly distributed in [-0.5, +0.5]^3 */
+			vec3 random3(vec3 c) {
+				float j = 4096.0*sin(dot(c,vec3(17.0, 59.4, 15.0)));
+				vec3 r;
+				r.z = fract(512.0*j);
+				j *= .125;
+				r.x = fract(512.0*j);
+				j *= .125;
+				r.y = fract(512.0*j);
+				return r-0.5;
+			}
+
+		    /* skew constants for 3d simplex functions */
+		    const float F3 =  0.3333333;
+		    const float G3 =  0.1666667;
+		    /* 3d simplex noise */
+		    float simplex3d(vec3 p) {
+				/* 1. find current tetrahedron T and it's four vertices */
+				/* s, s+i1, s+i2, s+1.0 - absolute skewed (integer) coordinates of T vertices */
+				/* x, x1, x2, x3 - unskewed coordinates of p relative to each of T vertices*/
+				/* calculate s and x */
+				vec3 s = floor(p + dot(p, vec3(F3)));
+				vec3 x = p - s + dot(s, vec3(G3));
+				/* calculate i1 and i2 */
+				vec3 e = step(vec3(0.0), x - x.yzx);
+				vec3 i1 = e*(1.0 - e.zxy);
+				vec3 i2 = 1.0 - e.zxy*(1.0 - e);
+				/* x1, x2, x3 */
+				vec3 x1 = x - i1 + G3;
+				vec3 x2 = x - i2 + 2.0*G3;
+				vec3 x3 = x - 1.0 + 3.0*G3;
+				/* 2. find four surflets and store them in d */
+				vec4 w, d;
+				/* calculate surflet weights */
+				w.x = dot(x, x);
+				w.y = dot(x1, x1);
+				w.z = dot(x2, x2);
+				w.w = dot(x3, x3);
+				/* w fades from 0.6 at the center of the surflet to 0.0 at the margin */
+				w = max(0.6 - w, 0.0);
+				/* calculate surflet components */
+				d.x = dot(random3(s), x);
+				d.y = dot(random3(s + i1), x1);
+				d.z = dot(random3(s + i2), x2);
+				d.w = dot(random3(s + 1.0), x3);
+				/* multiply d by w^4 */
+				w *= w;
+				w *= w;
+				d *= w;
+				/* 3. return the sum of the four surflets */
+				return dot(d, vec4(52.0)) + 0.5;
+		    }
+			/*
+		    float valueNoise( in vec3 x )
+		    {
+		        vec3 p = floor(x);
+		        vec3 f = fract(x);
+		      f = f*f*(3.0-2.0*f);
+		      vec2 uv = (p.xy+vec2(37.0,17.0)*p.z) + f.xy;
+		      vec2 rg = texture2D( iChannel0, (uv+0.5)/256.0, -100.0 ).yx;
+		      return mix( rg.x, rg.y, f.z ) - 0.5;
+		    }
+			*/
+		    float fractalNoise(vec3 p)
+		    {
+		        float f = 0.0;
+		        float a = 0.5;
+		        // add animation
+		        p = p + vec3(0.4, 0.0, 1.0) * time * 5.02;
+		        p = p * 0.002;
+		        for (float i = 0.0; i < 32.0; i++ ) {
+		        	if( i > noiseIterations) {
+		        		break;
+		        	}
+		          //f += a * valueNoise(p);
+		            f += a * simplex3d(p) * 0.01 * audio[int(i)];
+		            // f += a * simplex3d(p);
+		            p *= 2.0;
+		            a *= 0.6;
+		        }
+		        return f;
+		    }
+
+	  		/// END NOISE CODE
+
+		void main()	{
+
+			vPosition = position;
+	        vNormal = normal;
+			vColor = color;
+	      	
+	        vec3 p = position;
+	        vec3 noise = vec3(fractalNoise(p.xyz),fractalNoise(p.zyx),fractalNoise(p.yzx));
+	        p = (position) * 0.4 + 0.6 *(sensitivity * sin(noise * 1.5 + position.y * 0.0002 - 1.5)+1.0); //500.0*noise;//
+			gl_Position = projectionMatrix * modelViewMatrix * vec4( p, 1.0 );
+
+		}
+
+		</script>
+
+		<script id="fragmentShader" type="x-shader/x-fragment">
+
+			precision mediump float;
+			precision mediump int;
+
+			uniform float time;
+			uniform float sensitivity;
+
+			varying vec3 vPosition;
+			varying vec3 vNormal;
+			varying vec4 vColor;
+
+			void main()	{
+				vec3 lightDir = normalize(vec3(1.0, 0.0, 0.0));
+				vec4 color = vec4( vColor );
+        		color *= dot(normalize(vNormal),lightDir);
+				// color.r += sin( vPosition.x * 10.0 + time ) * 0.5;
+
+				gl_FragColor = color;
+			}
+
+		</script>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var container, stats;
+
+			var camera, scene, renderer, controls;
+			var listener, audioLoader, audioArray, analyser;
+			var pointLight, skyBox;
+			var gui, params, triangleCount;
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.getElementById( 'container' );
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 5, 50000 );
+
+				camera.position.set(250,-557, 253);
+
+				scene = new THREE.Scene();
+
+				params = {
+					sensitivity: 100.0,
+					pointLightIntensity : 0.13,
+					time : 0.3,
+					noiseIterations : 32.0,
+					triangleCount : 45000
+				};
+				gui = new dat.GUI();
+				gui.add( params, "sensitivity", 1.0, 200.0 ).listen();
+				gui.add( params, "pointLightIntensity", 0.0, 1.0 ).listen();
+				gui.add( params, "time", 0.0, 2.0 ).listen();
+				gui.add( params, "noiseIterations", 1.0, 32.0 ).listen();
+				triangleCount = gui.add( params, "triangleCount", 1, 100000 ).listen();
+				
+		        //audio
+		        var listener = new THREE.AudioListener();
+		        camera.add( listener );
+		        
+		        var sound = new THREE.Audio( listener );
+		        var audioLoader = new THREE.AudioLoader();
+		        var url = '/WebAssets/audio/JaiPaul.mp3'
+		        // Load a sound and set it as the Audio object's buffer
+		        audioLoader.load( url , function( buffer ) {
+		          sound.setBuffer( buffer );
+		          sound.setLoop(true);
+		          sound.setVolume(0.5);
+		          sound.play();
+		        });
+		        var bufferLength = 32;
+		        analyser = new THREE.AudioAnalyser( sound, bufferLength );
+		        audioArray = new Uint8Array(bufferLength);        
+
+		        var geometry = generateGeometry();
+
+				// material
+
+				var material = new THREE.RawShaderMaterial( {
+
+					uniforms: {
+						time: { value: 1.0 },
+						audio : { type: "fv1",  value: new Array(bufferLength) },
+						sensitivity : { value: params.sensitivity },
+						noiseIterations : { value: params.noiseIterations }
+					},
+					vertexShader: document.getElementById( 'vertexShader' ).textContent,
+					fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
+					side: THREE.DoubleSide,
+					transparent: true
+
+				} );
+
+				var mesh = new THREE.Mesh( geometry, material );
+				scene.add( mesh );
+
+				pointLight = new THREE.PointLight(0xFFFFFF, 1.0);
+				scene.add(pointLight);
+        
+				var skyBoxMat = new THREE.MeshStandardMaterial( { roughness:0.4, color: 0xFFFFFF, emissive: 0x000000, emissiveIntensity:0, side: THREE.DoubleSide } ); // color is in hexidecimal
+				var skyBoxGeom = new THREE.SphereGeometry(5000, 32, 32);
+				skyBox = new THREE.Mesh(skyBoxGeom, skyBoxMat);
+				scene.add(skyBox);
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setClearColor( 0x101010 );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
+				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.enableDamping = true;
+				controls.dampingFactor = 0.9;  
+				controls.zoomSpeed = 0.5;
+				controls.rotateSpeed = 0.5;	
+        
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			triangleCount.onChange(function(value) {
+				scene.children[ 0 ].geometry = generateGeometry();
+				scene.children[ 0 ].geometry.needsUpdate = true;
+			});
+
+			function generateGeometry() {
+				// geometry
+				var triangles = params.triangleCount;
+
+				var geometry = new THREE.BufferGeometry();
+
+				var indices = new Uint32Array( triangles * 3 );
+
+				for ( var i = 0; i < indices.length; i ++ ) {
+					indices[ i ] = i;
+				}
+
+				var positions = new Float32Array( triangles * 3 * 3 );
+				var normals = new Int16Array( triangles * 3 * 3 );
+				var colors = new Uint8Array( triangles * 3 * 3 );
+
+				var color = new THREE.Color();
+
+				var n = 1000, n2 = n/16;	// triangles spread in the cube
+				var d = 12, d2 = d/2;	// individual triangle size
+
+				var pA = new THREE.Vector3();
+				var pB = new THREE.Vector3();
+				var pC = new THREE.Vector3();
+
+				var cb = new THREE.Vector3();
+				var ab = new THREE.Vector3();
+				
+				var sphereRaduis = 100;
+
+				for ( var i = 0; i < positions.length; i += 9 ) {
+					var x = Math.random() * n -  n / 2;
+					var y = Math.random() * n -  n / 2;
+					var z = Math.random() * n -  n / 2;
+					while(Math.sqrt(x * x + y * y + z * z) > sphereRaduis) {
+						x = Math.random() * n -  n / 2;
+						y = Math.random() * n -  n / 2;
+						z = Math.random() * n -  n / 2;
+					}
+
+					var ax = x + Math.random() * d - d2;
+					var ay = y + Math.random() * d - d2;
+					var az = z + Math.random() * d - d2;
+
+					var bx = x + Math.random() * d - d2;
+					var by = y + Math.random() * d - d2;
+					var bz = z + Math.random() * d - d2;
+
+					var cx = x + Math.random() * d - d2;
+					var cy = y + Math.random() * d - d2;
+					var cz = z + Math.random() * d - d2;
+
+					positions[ i ]     = ax;
+					positions[ i + 1 ] = ay;
+					positions[ i + 2 ] = az;
+
+					positions[ i + 3 ] = bx;
+					positions[ i + 4 ] = by;
+					positions[ i + 5 ] = bz;
+
+					positions[ i + 6 ] = cx;
+					positions[ i + 7 ] = cy;
+					positions[ i + 8 ] = cz;
+
+					// flat face normals
+
+					pA.set( ax, ay, az );
+					pB.set( bx, by, bz );
+					pC.set( cx, cy, cz );
+
+					cb.subVectors( pC, pB );
+					ab.subVectors( pA, pB );
+					cb.cross( ab );
+
+					cb.normalize();
+
+					var nx = cb.x;
+					var ny = cb.y;
+					var nz = cb.z;
+
+					normals[ i ]     = nx * 32767;
+					normals[ i + 1 ] = ny * 32767;
+					normals[ i + 2 ] = nz * 32767;
+
+					normals[ i + 3 ] = nx * 32767;
+					normals[ i + 4 ] = ny * 32767;
+					normals[ i + 5 ] = nz * 32767;
+
+					normals[ i + 6 ] = nx * 32767;
+					normals[ i + 7 ] = ny * 32767;
+					normals[ i + 8 ] = nz * 32767;
+
+					// colors
+
+					var vx = (  x / sphereRaduis/2 ) + 0.7;
+					var vy = (  y / sphereRaduis/2) + 0.7;
+					var vz = (  z / sphereRaduis/2) + 0.7;
+
+					color.setRGB( vx, vy, vz );
+
+					colors[ i ]     = color.r * 255;
+					colors[ i + 1 ] = color.g * 255;
+					colors[ i + 2 ] = color.b * 255;
+
+					colors[ i + 3 ] = color.r * 255;
+					colors[ i + 4 ] = color.g * 255;
+					colors[ i + 5 ] = color.b * 255;
+
+					colors[ i + 6 ] = color.r * 255;
+					colors[ i + 7 ] = color.g * 255;
+					colors[ i + 8 ] = color.b * 255;
+
+				}
+
+				geometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );
+				geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+				geometry.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3, true ) );
+				geometry.addAttribute( 'color', new THREE.BufferAttribute( colors, 3, true ) );
+				geometry.computeBoundingSphere();
+				return geometry;				
+			}
+
+			function onWindowResize( event ) {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				var time = performance.now();
+	
+				var object = scene.children[ 0 ];
+				controls.update();
+		        var size = analyser.getAverageFrequency() * 0.01;
+		        pointLight.intensity = size * params.pointLightIntensity;
+		        audioArray = analyser.getFrequencyData();
+				var arr = new Array(audioArray.length);
+				for(var i = 0; i < audioArray.length; i++) {
+					arr[i] = audioArray[i];
+				}
+				camera.lookAt(object.position);
+				object.material.uniforms.audio.value = arr;
+				object.material.uniforms.time.value += (time * 0.000005) * 0.7 + size * size * params.time;
+				object.material.uniforms.sensitivity.value = params.sensitivity;
+				object.material.uniforms.noiseIterations.value = params.noiseIterations;
+				
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>
