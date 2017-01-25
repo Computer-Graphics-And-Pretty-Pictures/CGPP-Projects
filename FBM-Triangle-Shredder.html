@@ -279,11 +279,11 @@
 				scene.add(pointLight);
         
 				var skyBoxMat = new THREE.MeshStandardMaterial( { roughness:0.4, color: 0xFFFFFF, emissive: 0x000000, emissiveIntensity:0, side: THREE.DoubleSide } ); // color is in hexidecimal
-				var skyBoxGeom = new THREE.SphereGeometry(5000, 32, 32);
+				var skyBoxGeom = new THREE.SphereGeometry(3500, 32, 32);
 				skyBox = new THREE.Mesh(skyBoxGeom, skyBoxMat);
 				scene.add(skyBox);
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer({ antialias : true });
 				renderer.setClearColor( 0x101010 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -294,6 +294,7 @@
 				controls.dampingFactor = 0.9;  
 				controls.zoomSpeed = 0.5;
 				controls.rotateSpeed = 0.5;	
+				controls.maxDistance = 3000;
         
 				stats = new Stats();
 				container.appendChild( stats.dom );
