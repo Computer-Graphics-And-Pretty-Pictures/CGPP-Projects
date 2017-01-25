@@ -196,7 +196,7 @@
 			var camera, scene, renderer, controls;
 			var listener, audioLoader, audioArray, analyser;
 			var pointLight, skyBox;
-			var gui, params, triangleCount;
+			var gui, params, triangleCount, triangleSize, sphereSpread;
 
 			init();
 			animate();
@@ -213,17 +213,27 @@
 
 				params = {
 					sensitivity: 100.0,
-					pointLightIntensity : 0.13,
+					pointLightIntensity : 0.14,
 					time : 0.3,
 					noiseIterations : 32.0,
-					triangleCount : 45000
+					sphereSpread : 1000,
+					triangleCount : 45000,
+					triangleSize : 12
 				};
 				gui = new dat.GUI();
-				gui.add( params, "sensitivity", 1.0, 200.0 ).listen();
-				gui.add( params, "pointLightIntensity", 0.0, 1.0 ).listen();
-				gui.add( params, "time", 0.0, 2.0 ).listen();
-				gui.add( params, "noiseIterations", 1.0, 32.0 ).listen();
-				triangleCount = gui.add( params, "triangleCount", 1, 100000 ).listen();
+				var f1 = gui.addFolder('Lights');
+				f1.add( params, "pointLightIntensity", 0.0, 1.0 ).listen();
+				var f2 = gui.addFolder('Noise');
+				var f3 = gui.addFolder('Geometry');
+				f2.add( params, "sensitivity", 1.0, 200.0 ).listen();
+				f2.add( params, "time", 0.0, 2.0 ).listen();
+				f2.add( params, "noiseIterations", 1.0, 32.0 ).listen();
+				sphereSpread = f3.add( params, "sphereSpread", 100, 5000 ).listen();
+				triangleCount = f3.add( params, "triangleCount", 1, 150000 ).listen();
+				triangleSize = f3.add( params, "triangleSize", 1, 100 ).listen();
+				
+				f2.open();
+				f3.open();
 				
 		        //audio
 		        var listener = new THREE.AudioListener();
@@ -297,6 +307,16 @@
 				scene.children[ 0 ].geometry.needsUpdate = true;
 			});
 
+			sphereSpread.onChange(function(value) {
+				scene.children[ 0 ].geometry = generateGeometry();
+				scene.children[ 0 ].geometry.needsUpdate = true;
+			});
+
+			triangleSize.onChange(function(value) {
+				scene.children[ 0 ].geometry = generateGeometry();
+				scene.children[ 0 ].geometry.needsUpdate = true;
+			});
+
 			function generateGeometry() {
 				// geometry
 				var triangles = params.triangleCount;
@@ -315,8 +335,8 @@
 
 				var color = new THREE.Color();
 
-				var n = 1000, n2 = n/16;	// triangles spread in the cube
-				var d = 12, d2 = d/2;	// individual triangle size
+				var n = params.sphereSpread;	// triangles spread in the sphere
+				var d = params.triangleSize, d2 = d/2;	// individual triangle size
 
 				var pA = new THREE.Vector3();
 				var pB = new THREE.Vector3();
@@ -325,7 +345,7 @@
 				var cb = new THREE.Vector3();
 				var ab = new THREE.Vector3();
 				
-				var sphereRaduis = 100;
+				var sphereRaduis = n / 3;
 
 				for ( var i = 0; i < positions.length; i += 9 ) {
 					var x = Math.random() * n -  n / 2;
