@@ -197,6 +197,7 @@
 			var listener, audioLoader, audioArray, bufferLength, analyser, smoothVolume;
 			var pointLight, skyBox;
 			var gui, params, triangleCount, triangleSize, sphereSpread;
+			var sound, playAudio, volume;
 
 			init();
 			animate();
@@ -219,21 +220,26 @@
 					audioSmoothing: 0.9,
 					sphereSpread : 1000,
 					triangleCount : 200000,
-					triangleSize : 12
+					triangleSize : 12,
+					playAudio : false,
+					volume : 0.5
 				};
 				gui = new dat.GUI();
 				var f1 = gui.addFolder('Lights');
 				f1.add( params, "pointLightIntensity", 0.0, 0.5 ).listen();
 				var f2 = gui.addFolder('Noise');
-				var f3 = gui.addFolder('Geometry');
-				var f4 = gui.addFolder('Audio');
-				f4.add( params, "audioSmoothing", 0.0, 0.9).listen();
 				f2.add( params, "sensitivity", 1.0, 600.0 ).listen();
 				f2.add( params, "time", -0.7, 2.0 ).listen();
 				f2.add( params, "noiseIterations", 1.0, 32.0 ).listen();
+				var f3 = gui.addFolder('Geometry');
 				sphereSpread = f3.add( params, "sphereSpread", 100, 5000 ).listen();
 				triangleCount = f3.add( params, "triangleCount", 1, 800000 ).listen();
 				triangleSize = f3.add( params, "triangleSize", 1, 100 ).listen();
+				var f4 = gui.addFolder('Audio');
+				f4.add( params, "audioSmoothing", 0.0, 0.9).listen();
+				volume = f4.add( params, "volume", 0.0, 1.0).listen();
+				playAudio = f4.add( params, "playAudio").listen();
+				
 				
 				f2.open();
 				f3.open();
@@ -242,7 +248,7 @@
 		        var listener = new THREE.AudioListener();
 		        camera.add( listener );
 		        
-		        var sound = new THREE.Audio( listener );
+		        sound = new THREE.Audio( listener );
 		        var audioLoader = new THREE.AudioLoader();
 		        var url = '/WebAssets/audio/JaiPaul.mp3'
 		        audioLoader.load( url , function( buffer ) {
@@ -250,6 +256,8 @@
 					sound.setLoop(true);
 					sound.setVolume(0.5);
 					sound.play();
+					sound.autoplay = true;
+					params.playAudio = true;
 		        },
 				function ( xhr ) {
 					console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
@@ -315,6 +323,7 @@
 
 			}
 
+			//Dat.gui callback methods
 			triangleCount.onChange(function(value) {
 				scene.children[ 0 ].geometry = generateGeometry();
 				scene.children[ 0 ].geometry.needsUpdate = true;
@@ -329,6 +338,23 @@
 				scene.children[ 0 ].geometry = generateGeometry();
 				scene.children[ 0 ].geometry.needsUpdate = true;
 			});
+			
+			volume.onChange(function(value) {
+				sound.setVolume(value);
+			});
+
+			playAudio.onChange(function(shouldPlay) {
+				if (shouldPlay) {
+					sound.play();
+				} else {
+					sound.pause();
+				}
+				
+			});
+
+			
+			
+			
 
 			function generateGeometry() {
 				// geometry
