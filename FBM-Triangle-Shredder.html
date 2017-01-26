@@ -236,25 +236,26 @@
 				var f1 = gui.addFolder('Lights');
 				f1.add( params, "pointLightIntensity", 0.0, 0.5 ).listen();
 				var f2 = gui.addFolder('Noise');
-				f2.add( params, "sensitivity", 1.0, 600.0 ).listen();
 				f2.add( params, "time", -0.7, 2.0 ).listen();
-				f2.add( params, "noiseIterations", 1.0, 32.0 ).listen();
 				var f3 = gui.addFolder('Geometry');
+				if( window.mobileAndTabletcheck() ) {
+					f2.add( params, "sensitivity", 1.0, 100.0 ).listen();
+					f2.add( params, "noiseIterations", 1.0, 6.0 ).listen();
+					triangleCount = f3.add( params, "triangleCount", 1, 100000 ).listen();
+				} else {
+					f2.add( params, "sensitivity", 1.0, 600.0 ).listen();
+					f2.add( params, "noiseIterations", 1.0, 32.0 ).listen();
+					triangleCount = f3.add( params, "triangleCount", 1, 800000 ).listen();
+				}
 				sphereSpread = f3.add( params, "sphereSpread", 100, 5000 ).listen();
-				triangleCount = f3.add( params, "triangleCount", 1, 800000 ).listen();
+				
 				triangleSize = f3.add( params, "triangleSize", 1, 100 ).listen();
 				var f4 = gui.addFolder('Audio');
 				f4.add( params, "audioSmoothing", 0.0, 0.9).listen();
-				volume = f4.add( params, "volume", 0.0, 1.0).listen();
+				volume = f4.add( params, "volume", 0.0, 0.5).listen();
 				playAudio = f4.add( params, "playAudio").listen();
 				f2.open();
 				f3.open();
-
-				if( window.mobileAndTabletcheck() ) {
-					params.triangleCount = 50000;
-					params.noiseIterations = 3;
-					params.audioSmoothing = 0.0;
-				}
 				
 		        //audio
 		        var listener = new THREE.AudioListener();
