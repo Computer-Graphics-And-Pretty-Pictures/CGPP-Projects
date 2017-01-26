@@ -358,6 +358,7 @@
 			playAudio.onChange(function(shouldPlay) {
 				if (shouldPlay) {
 					sound.play();
+					analyser = new THREE.AudioAnalyser( sound, bufferLength );
 				} else {
 					sound.pause();
 				}
