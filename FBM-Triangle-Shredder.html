@@ -245,13 +245,18 @@
 		        var sound = new THREE.Audio( listener );
 		        var audioLoader = new THREE.AudioLoader();
 		        var url = '/WebAssets/audio/JaiPaul.mp3'
-		        // Load a sound and set it as the Audio object's buffer
 		        audioLoader.load( url , function( buffer ) {
-		          sound.setBuffer( buffer );
-		          sound.setLoop(true);
-		          sound.setVolume(0.5);
-		          sound.play();
-		        });
+					sound.setBuffer( buffer );
+					sound.setLoop(true);
+					sound.setVolume(0.5);
+					sound.play();
+		        },
+				function ( xhr ) {
+					console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+				},
+				function ( xhr ) {
+					console.log( 'An error happened' );
+				});
 		        bufferLength = 32;
 		        analyser = new THREE.AudioAnalyser( sound, bufferLength );
 		        audioArray = new Array(bufferLength);// Uint8Array(bufferLength); 
