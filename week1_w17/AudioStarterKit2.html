@@ -69,6 +69,12 @@
           sound.setLoop(true);
           sound.setVolume(0.5);
           sound.play();
+        },
+        function ( xhr ) {
+          console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+        },
+        function ( xhr ) {
+          console.log( 'An error happened' );
         });
         
         //Create an AudioAnalyser, passing in the sound and desired fftSize

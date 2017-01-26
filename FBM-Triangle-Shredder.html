@@ -251,9 +251,8 @@
 				f3.open();
 
 				if( window.mobileAndTabletcheck() ) {
-					params.triangleCount = 10000;
+					params.triangleCount = 50000;
 					params.noiseIterations = 3;
-
 				}
 				
 		        //audio
@@ -370,7 +369,7 @@
 
 			function generateGeometry() {
 				// geometry
-				var triangles = params.triangleCount;
+				var triangles = Math.round(params.triangleCount);
 
 				var geometry = new THREE.BufferGeometry();
 
@@ -386,8 +385,8 @@
 
 				var color = new THREE.Color();
 
-				var n = params.sphereSpread;	// triangles spread in the sphere
-				var d = params.triangleSize, d2 = d/2;	// individual triangle size
+				var n = Math.round(params.sphereSpread);	// triangles spread in the sphere
+				var d = Math.round(params.triangleSize), d2 = d/2;	// individual triangle size
 
 				var pA = new THREE.Vector3();
 				var pB = new THREE.Vector3();
