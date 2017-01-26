@@ -227,7 +227,7 @@
 				var f2 = gui.addFolder('Noise');
 				var f3 = gui.addFolder('Geometry');
 				var f4 = gui.addFolder('Audio');
-				f4.add( params, "audioSmoothing", 0.0, 1.5).listen();
+				f4.add( params, "audioSmoothing", 0.0, 0.9).listen();
 				f2.add( params, "sensitivity", 1.0, 600.0 ).listen();
 				f2.add( params, "time", -0.7, 2.0 ).listen();
 				f2.add( params, "noiseIterations", 1.0, 32.0 ).listen();
@@ -477,7 +477,6 @@
 				for(var i = 0; i < audioArray.length; i++) {
 					audioArray[i] = smoothA * audioArray[i] + smoothB * freshAudio[i]; 
 				}
-				console.log(audioArray);
 				camera.lookAt(object.position);
 				object.material.uniforms.audio.value = audioArray;
 				object.material.uniforms.time.value += (time * 0.000005) * 0.7 + smoothVolume * smoothVolume * params.time;
