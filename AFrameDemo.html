@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>CGPP VR HomePage</title>
+    <meta name="description" content="CGPP VR HomePage">
+    <script src="https://aframe.io/releases/0.4.0/aframe.min.js"></script>
+    <script src="https://unpkg.com/aframe-text-component@0.4.x/dist/aframe-text-component.min.js"></script>
+    <script src="https://npmcdn.com/aframe-animation-component@3.0.1"></script>
+    <script src="https://npmcdn.com/aframe-event-set-component@3.0.1"></script>
+    <script src="https://npmcdn.com/aframe-layout-component@3.0.1"></script>
+    <script src="https://npmcdn.com/aframe-template-component@3.1.1"></script>    
+    <script type="text/javascript">
+
+      AFRAME.registerComponent('open-url', {
+        schema : {
+          on: {type: 'string'},
+          src: {type: 'string'}
+        },
+
+        init: function() {
+          var data = this.data;
+          this.el.addEventListener(data.on, function() {
+            window.location.href = data.src;
+          });
+        }
+      });      
+    </script>
+
+    <!-- Image link template to be reused. -->
+    <script id="link" type="text/html">
+      <a-entity class="link"
+        geometry="primitive: plane; height: 4; width: 4"
+        material="shader: flat; side: double; src: ${thumb}"
+        event-set__1="_event: mousedown; scale: 1 1 1"
+        event-set__2="_event: mouseup; scale: 1.2 1.2 1"
+        event-set__3="_event: mouseenter; scale: 1.2 1.2 1"
+        event-set__4="_event: mouseleave; scale: 1 1 1"
+        open-url="on: click; src: ${src}"
+        sound="on: click; src: #click-sound"></a-entity>
+    </script>      
+  </head>
+
+  <body>
+    <a-scene debug>
+      <a-assets>
+        <img id="skyTexture" src="/WebAssets/images/360Desert.jpg">
+        <audio id="click-sound" crossorigin="anonymous" src="https://cdn.aframe.io/360-image-gallery-boilerplate/audio/click.ogg"></audio>
+        <!-- <img id="skyTexture" crossorigin="anonymous" src="https://cdn.aframe.io/360-image-gallery-boilerplate/img/sechelt.jpg"> -->
+
+        <img id="img8" src="WebAssets/images/8.png">
+        <img id="img7" src="WebAssets/images/7.png">
+        <img id="img6" src="WebAssets/images/6.png">
+        <img id="img5" src="WebAssets/images/5.png">
+        <img id="img4" src="WebAssets/images/4.png">
+        <img id="img3" src="WebAssets/images/3.png">
+        <img id="img2" src="WebAssets/images/2.png">
+        <img id="img1" src="WebAssets/images/1.png">
+      </a-assets>
+      <!-- box, circle, cube, dodecahedron, line, pyramid -->
+      <a-entity id="links" layout="type: line; margin: 5" position="-20 -1 -20"> 
+        <a-entity template="src: #link" data-src="week1_w17/AudioStarterKit2.html" data-thumb="#img8"></a-entity>
+        <a-entity template="src: #link" data-src="Volumetric.html" data-thumb="#img7"></a-entity>
+        <a-entity template="src: #link" data-src="#Fire-and-Water.html" data-thumb="#img6"></a-entity>
+        <a-entity template="src: #link" data-src="Shaders-FractalTorus.html" data-thumb="#img5"></a-entity>
+        <a-entity template="src: #link" data-src="Shaders-Torus.html" data-thumb="#img4"></a-entity>
+        <a-entity template="src: #link" data-src="Project2b-Simple-Controls.html" data-thumb="#img3"></a-entity>
+        <a-entity template="src: #link" data-src="Project2a-Multiple-Objects.html" data-thumb="#img2"></a-entity>
+        <a-entity template="src: #link" data-src="Project1-Lighting.html" data-thumb="#img1"></a-entity>
+      </a-entity>
+      <a-entity class="link" rotation="90 0 0" position="0 -5 0" geometry="primitive : plane; height : 100; width : 100" material="opacity : 0.28; side : double; color : #000000;"></a-entity>
+      <a-sky src="#skyTexture"></a-sky>
+
+      <a-entity camera look-controls wasd-controls>
+        <a-cursor id="cursor"
+          animation__click="property: scale; startEvents: click; from: 0.1 0.1 0.1; to: 1 1 1; dur: 150"
+          animation__fusing="property: fusing; startEvents: fusing; from: 1 1 1; to: 0.1 0.1 0.1; dur: 1500"
+          event-set__1="_event: mouseenter; color: springgreen"
+          event-set__2="_event: mouseleave; color: black"
+          raycaster="objects: .link">
+        </a-cursor>
+      </a-entity>
+    </a-scene>
+
+  </body>
+</html>
