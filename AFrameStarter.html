@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>CGPP VR HomePage</title>
+    <meta name="description" content="CGPP VR HomePage">
+    <script src="https://aframe.io/releases/0.4.0/aframe.min.js"></script>
+    <script src="https://unpkg.com/aframe-text-component@0.4.x/dist/aframe-text-component.min.js"></script>
+    <script src="https://npmcdn.com/aframe-animation-component@3.0.1"></script>
+    <script src="https://npmcdn.com/aframe-event-set-component@3.0.1"></script>
+    <script src="https://npmcdn.com/aframe-layout-component@3.0.1"></script>
+    <script src="https://npmcdn.com/aframe-template-component@3.1.1"></script>    
+  </head>
+
+  <body>
+    <a-scene >
+      <a-assets>
+        <img id="skyTexture" src="WebAssets/images/360Desert.jpg">
+        <audio id="click-sound" crossorigin="anonymous" src="https://cdn.aframe.io/360-image-gallery-boilerplate/audio/click.ogg"></audio>
+        <!-- <img id="skyTexture" crossorigin="anonymous" src="https://cdn.aframe.io/360-image-gallery-boilerplate/img/sechelt.jpg"> -->
+        <a-asset-item id="optimerBoldFont" src="https://rawgit.com/mrdoob/three.js/dev/examples/fonts/optimer_bold.typeface.json"></a-asset-item>
+        <img id="img8" src="WebAssets/images/8.png">
+        <img id="img7" src="WebAssets/images/7.png">
+        <img id="img6" src="WebAssets/images/6.png">
+        <img id="img5" src="WebAssets/images/5.png">
+        <img id="img4" src="WebAssets/images/4.png">
+        <img id="img3" src="WebAssets/images/3.png">
+        <img id="img2" src="WebAssets/images/2.png">
+        <img id="img1" src="WebAssets/images/1.png">
+      </a-assets>
+      
+      <a-entity 
+        geometry="primitive : box; height : 5; width : 5; depth 5" 
+        material="opacity : 1; side : double; color : #000000;"
+        rotation="90 0 0" 
+        position="0 2 -5"></a-entity>
+
+      <a-entity camera look-controls wasd-controls>
+        <a-cursor id="cursor"
+          animation__click="property: scale; startEvents: click; from: 0.1 0.1 0.1; to: 1 1 1; dur: 150"
+          animation__fusing="property: fusing; startEvents: fusing; from: 1 1 1; to: 0.1 0.1 0.1; dur: 1500"
+          event-set__1="_event: mouseenter; color: springgreen"
+          event-set__2="_event: mouseleave; color: black"
+          raycaster="objects: .link">
+        </a-cursor>
+      </a-entity>
+    </a-scene>
+
+  </body>
+</html>
