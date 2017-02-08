@@ -40,6 +40,8 @@
 		<script src="js/Detector.js"></script>
 		<script src="js/stats.min.js"></script>
 	    <script src="js/OrbitControls.js"></script>
+		<script src="js/ExplodeModifier.js"></script>
+		<script src="js/TessellateModifier.js"></script>
 
 		<script id="vertexShader" type="x-shader/x-vertex">
 
@@ -49,11 +51,12 @@
 			uniform mat4 modelViewMatrix; // optional
 			uniform mat4 projectionMatrix; // optional
 			uniform float time;
-			uniform float audio[32];
+			uniform float audio[64];
 			uniform float sensitivity;
 			uniform float scale;
 			uniform float sinScale;
 			uniform float noiseIterations; 
+
 
 			attribute vec3 position;
 			attribute vec3 normal;
@@ -118,31 +121,18 @@
 				/* 3. return the sum of the four surflets */
 				return dot(d, vec4(52.0)) + 0.5;
 		    }
-			/*
-		    float valueNoise( in vec3 x )
-		    {
-		        vec3 p = floor(x);
-		        vec3 f = fract(x);
-		      f = f*f*(3.0-2.0*f);
-		      vec2 uv = (p.xy+vec2(37.0,17.0)*p.z) + f.xy;
-		      vec2 rg = texture2D( iChannel0, (uv+0.5)/256.0, -100.0 ).yx;
-		      return mix( rg.x, rg.y, f.z ) - 0.5;
-		    }
-			*/
+
 		    float fractalNoise(vec3 p)
 		    {
 		        float f = 0.0;
 		        float a = 0.5;
-		        // add animation
 		        p = p + vec3(0.4, 0.0, 1.0) * time * 5.02;
 		        p = p * scale;
 		        for (float i = 0.0; i < 32.0; i++ ) {
 		        	if( i > noiseIterations) {
 		        		break;
 		        	}
-		          //f += a * valueNoise(p);
 		            f += a * simplex3d(p) * 0.01 * audio[int(i)];
-		            // f += a * simplex3d(p);
 		            p *= 2.0;
 		            a *= 0.5;
 		        }
@@ -161,8 +151,9 @@
 	      	
 	        vec3 p = position;
 	        vec3 noise = vec3(fractalNoise(p.xyz),fractalNoise(p.zyx),fractalNoise(p.yzx));
-	        p = (position) * 0.4 + 0.6 *(sensitivity * sin(noise * sinScale + position.z * 0.0002 - sinScale)+1.0); //500.0*noise;//
+	        p = (position) * 0.4 + 0.6 *(sensitivity * sin(noise * sinScale + position.z * 0.000333 + position.y * 0.000333 + position.x * 0.00033 - sinScale)+1.0); //500.0*noise;//
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( p, 1.0 );
+			gl_PointSize = 2.0;
 
 		}
 
@@ -176,18 +167,21 @@
 			uniform float time;
 			uniform float sensitivity;
 			uniform vec4 lightColor;
+			uniform float colorContour;
 
 			varying vec3 vPosition;
 			varying vec3 vNormal;
 			varying vec4 vColor;
+
 
 			void main()	{
 				vec3 lightDir = normalize(vec3(1.0, 0.0, 0.0));
 				
 				vec4 color = lightColor;//vec4( vColor );
         		color *= dot(normalize(vNormal),lightDir);
+        		color = 0.5 * sin(color * colorContour) + 0.5;
 				// color.r += sin( vPosition.x * 10.0 + time ) * 0.5;
-				
+				color.a *= 0.5;
 				gl_FragColor = color;
 				
 				/*
@@ -222,12 +216,17 @@
 			var camera, scene, renderer, controls;
 			var listener, audioLoader, audioArray, bufferLength, analyser, smoothVolume;
 			var pointLight, skyBox;
-			var gui, params, triangleCount, triangleSize, sphereSpread;
-			var sound, playAudio, volume, geometry;
+			var gui, params, detail, pointSize, size, drawStyle, startingShape, selectedGeometry;
+			var sound, playAudio, volume, geometry, material, mesh;
 			var colorTracker;
 
+			var loader = new THREE.FontLoader();
+			var font;
+			loader.load( 'WebAssets/fonts/SharpSansNo1Medium_Regular.json', function ( loadedFont ) {
+				font = loadedFont;
+			} );	
 			init();
-			animate();
+			animate();		
 
 			function init() {
 
@@ -241,51 +240,7 @@
 
 				colorTracker = new ColorTracker();
 
-				params = {
-					sensitivity: 125.0,
-					pointLightIntensity : 0.15,
-					time : 0.3,
-					noiseIterations : 6.0,
-					audioSmoothing: 0.8,
-					sphereSpread : 500,
-					triangleCount : 200,
-					triangleSize : 12,
-					playAudio : false,
-					scale : 0.006,
-					sinScale : 0.02,
-					volume : 0.5
-
-				};
-				gui = new dat.GUI();
-				var f1 = gui.addFolder('Lights');
-				f1.add( params, "pointLightIntensity", 0.0, 0.5 ).listen();
-				var f2 = gui.addFolder('Noise');
-				f2.add( params, "time", -0.7, 2.0 ).listen();
-				var f3 = gui.addFolder('Geometry');
-				if( window.mobileAndTabletcheck() ) {
-					params['triangleCount'] = 100000;
-					params['noiseIterations'] = 3.0;
-					params['sensitivity'] = 15.0;
-					f2.add( params, "sensitivity", 1.0, 30.0 ).listen();
-					f2.add( params, "noiseIterations", 1.0, 6.0 ).listen();
-					triangleCount = f3.add( params, "triangleCount", 1, 1000 ).listen();
-				} else {
-					f2.add( params, "sensitivity", 1.0, 600.0 ).listen();
-					f2.add( params, "noiseIterations", 1.0, 32.0 ).listen();
-					triangleCount = f3.add( params, "triangleCount", 1, 500 ).listen();
-				}
-				f2.add( params, "sinScale", 0.0001, 5.0 ).listen();
-				f2.add( params, "scale", 0.0001, 0.001 ).listen();
-				sphereSpread = f3.add( params, "sphereSpread", 1, 1000 ).listen();
-				
-				triangleSize = f3.add( params, "triangleSize", 1, 100 ).listen();
-				var f4 = gui.addFolder('Audio');
-				f4.add( params, "audioSmoothing", 0.0, 0.9).listen();
-				volume = f4.add( params, "volume", 0.0, 0.5).listen();
-				playAudio = f4.add( params, "playAudio").listen();
-				f2.open();
-				f3.open();
-				gui.remember(params);
+				initGui();
 				
 		        //audio
 		        var listener = new THREE.AudioListener();
@@ -293,7 +248,7 @@
 		        
 		        sound = new THREE.Audio( listener );
 		        var audioLoader = new THREE.AudioLoader();
-		        var url = '/WebAssets/audio/JaiPaul.mp3'
+		        var url = '/WebAssets/audio/SlowBurn.mp3'
 		        audioLoader.load( url , function( buffer ) {
 					sound.setBuffer( buffer );
 					sound.setLoop(true);
@@ -308,21 +263,16 @@
 				function ( xhr ) {
 					console.log( 'An error happened' );
 				});
-		        bufferLength = 32;
+		        bufferLength = 64;
 		        analyser = new THREE.AudioAnalyser( sound, bufferLength );
 		        audioArray = new Array(bufferLength);// Uint8Array(bufferLength); 
 		        for(var i = 0; i < audioArray.length; i++) {
 					audioArray[i] = 0.0;
 				}
 		        smoothVolume = 0.0;       
+		        var geometry = geometryType();
 
-		        geometry = new THREE.SphereBufferGeometry(params.sphereSpread, params.triangleCount, params.triangleCount).toNonIndexed();
-		        // geometry.addAttribute( 'color', new THREE.BufferAttribute( new THREE.Color(255, 0, 0, 1), 2, true ) );
-		        // var geometry = generateGeometry();
-
-				// material
-
-				var material = new THREE.RawShaderMaterial( {
+				material = new THREE.RawShaderMaterial( {
 
 					uniforms: {
 						time: { value: 1.0 },
@@ -331,7 +281,8 @@
 						noiseIterations : { value: params.noiseIterations },
 						lightColor : { value: new THREE.Vector4(1.0, 1.0, 1.0, 1.0) },
 						sinScale : { value: params.sinScale },
-						scale : { value: params.scale }
+						scale : { value: params.scale },
+						colorContour : { value: params.colorContour }
 					},
 					vertexShader: document.getElementById( 'vertexShader' ).textContent,
 					fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
@@ -340,14 +291,14 @@
 					derivatives: true
 				} );
 
-				var mesh = new THREE.Mesh( geometry, material );
+				mesh = new THREE.Points( geometry, material );
 				scene.add( mesh );
 
 				pointLight = new THREE.PointLight(0xFFFFFF, 1.0);
 				scene.add(pointLight);
         
 				var skyBoxMat = new THREE.MeshStandardMaterial( { roughness:0.4, color: 0xFFFFFF, emissive: 0x000000, emissiveIntensity:0, side: THREE.DoubleSide } ); // color is in hexidecimal
-				var skyBoxGeom = new THREE.SphereGeometry(3500, 32, 32);
+				var skyBoxGeom = new THREE.SphereGeometry(5500, 32, 32);
 				skyBox = new THREE.Mesh(skyBoxGeom, skyBoxMat);
 				scene.add(skyBox);
 
@@ -362,7 +313,7 @@
 				controls.dampingFactor = 0.9;  
 				controls.zoomSpeed = 0.5;
 				controls.rotateSpeed = 0.5;	
-				controls.maxDistance = 3000;
+				controls.maxDistance = 5000;
         
 				stats = new Stats();
 				container.appendChild( stats.dom );
@@ -371,22 +322,129 @@
 
 			}
 
+			function initGui() {
+				params = {
+					sensitivity: 125.0,
+					pointLightIntensity : 0.15,
+					time : 0.3,
+					noiseIterations : 6.0,
+					audioSmoothing: 0.8,
+					size : 500,
+					detail : 200,
+					pointSize : 12,
+					playAudio : false,
+					scale : 0.006,
+					sinScale : 0.2,
+					volume : 0.5,
+					colorContour : 3.0, 
+					style : ['Points', 'Line', 'Mesh'],
+					text : "CGPP",
+					startingShape : ['Plane', 'Sphere', 'Solid Sphere', 'Text']
+				};
+				gui = new dat.GUI();
+				var f1 = gui.addFolder('Lights');
+				f1.add( params, "pointLightIntensity", 0.0, 0.5 ).listen();
+				f1.add( params, "colorContour", 0.1, 20.0 ).listen();
+				var f2 = gui.addFolder('Noise');
+				f2.add( params, "time", -2.0, 4.0 ).listen();
+				var f3 = gui.addFolder('Geometry');
+				if( window.mobileAndTabletcheck() ) {
+					params['detail'] = 100;
+					params['noiseIterations'] = 3.0;
+					params['sensitivity'] = 15.0;
+					f2.add( params, "sensitivity", 1.0, 30.0 ).listen();
+					f2.add( params, "noiseIterations", 1.0, 6.0 ).listen();
+					detail = f3.add( params, "detail", 1, 1000 ).listen();
+				} else {
+					f2.add( params, "sensitivity", 1.0, 1500.0 ).listen();
+					f2.add( params, "noiseIterations", 1.0, 32.0 ).listen();
+					detail = f3.add( params, "detail", 1, 1000 ).listen();
+				}
+				f2.add( params, "sinScale", 0.0001, 10.0 ).listen();
+				f2.add( params, "scale", 0.0001, 0.006 ).listen();
+				size = f3.add( params, "size", 1, 50000 ).listen();
+				
+				pointSize = f3.add( params, "pointSize", 1, 100 ).listen();
+				drawStyle = f3.add( params, "style", params.style);
+				startingShape = f3.add( params, "startingShape", params.startingShape);
+				f3.add( params, "text", params.text );
+				var f4 = gui.addFolder('Audio');
+				f4.add( params, "audioSmoothing", 0.0, 0.9).listen();
+				volume = f4.add( params, "volume", 0.0, 0.5).listen();
+				playAudio = f4.add( params, "playAudio").listen();
+				f2.open();
+				f3.open();
+				selectedGeometry = "Sphere";
+				gui.remember(params);
+			}
+
+			function geometryType() {
+				if (selectedGeometry == "Plane") {
+					return new THREE.PlaneBufferGeometry(params.size, params.size, params.detail, params.detail).toNonIndexed();
+				} else if(selectedGeometry == "Sphere") {
+					return new THREE.SphereBufferGeometry(params.size, params.detail, params.detail).toNonIndexed();
+				} else if(selectedGeometry == "Solid Sphere") {
+					return generateSolidSphereGeometry();
+				} else if (selectedGeometry == "Text") {
+					return generateText();
+				}
+			}
+
+			function generateText() {
+				var geometry = new THREE.TextGeometry( params.text, {
+					font: font,
+					size: params.size,
+					height: 5,
+					curveSegments: params.detail,
+					bevelThickness: 20,
+					bevelSize: 1,
+					bevelEnabled: true
+				});
+				geometry.center();
+				var tessellateModifier = new THREE.TessellateModifier( 12 );
+				for ( var i = 0; i < 15; i ++ ) {
+					tessellateModifier.modify( geometry );
+				}
+
+				// var explodeModifier = new THREE.ExplodeModifier();
+				// explodeModifier.modify( geometry );
+
+				// var numFaces = geometry.faces.length;
+				return new THREE.BufferGeometry().fromGeometry( geometry );
+			}
+
+			startingShape.onChange(function(value) {
+				selectedGeometry = value;
+				scene.children[ 0 ].geometry = geometryType();
+				scene.children[ 0 ].geometry.needsUpdate = true;
+			});
+
+			drawStyle.onChange(function(value) {
+				if(value == "Points") {
+					scene.children[ 0 ] = new THREE.Points( geometryType(), material );
+				} else if(value == "Line") {
+					scene.children[ 0 ] = new THREE.Line( geometryType(), material );
+				} else {
+					scene.children[ 0 ] = new THREE.Mesh( geometryType(), material );
+				}
+				
+			});
+
 			//Dat.gui callback methods
-			triangleCount.onChange(function(value) {
-				scene.children[ 0 ].geometry = new THREE.SphereBufferGeometry(params.sphereSpread, params.triangleCount, params.triangleCount).toNonIndexed();
-				// scene.children[ 0 ].geometry = generateGeometry();
+			detail.onChange(function(value) {
+				
+				scene.children[ 0 ].geometry = geometryType();
+				
 				scene.children[ 0 ].geometry.needsUpdate = true;
 			});
 
-			sphereSpread.onChange(function(value) {
-				scene.children[ 0 ].geometry = new THREE.SphereBufferGeometry(params.sphereSpread, params.triangleCount, params.triangleCount).toNonIndexed();
-				// scene.children[ 0 ].geometry = generateGeometry();
+			size.onChange(function(value) {
+				scene.children[ 0 ].geometry = geometryType();
 				scene.children[ 0 ].geometry.needsUpdate = true;
 			});
 
-			triangleSize.onChange(function(value) {
-				scene.children[ 0 ].geometry = new THREE.SphereBufferGeometry(params.sphereSpread, params.triangleCount, params.triangleCount).toNonIndexed();
-				// scene.children[ 0 ].geometry = generateGeometry();
+			pointSize.onChange(function(value) {
+				scene.children[ 0 ].geometry = geometryType();
 				scene.children[ 0 ].geometry.needsUpdate = true;
 			});
 			
@@ -404,13 +462,9 @@
 				
 			});
 
-			
-			
-			
-
-			function generateGeometry() {
+			function generateSolidSphereGeometry() {
 				// geometry
-				var triangles = Math.round(params.triangleCount);
+				var triangles = Math.round(params.detail * 10);
 
 				var geometry = new THREE.BufferGeometry();
 
@@ -426,8 +480,8 @@
 
 				var color = new THREE.Color();
 
-				var n = Math.round(params.sphereSpread);	// triangles spread in the sphere
-				var d = Math.round(params.triangleSize), d2 = d/2;	// individual triangle size
+				var n = Math.round(params.size);	// triangles spread in the sphere
+				var d = Math.round(params.pointSize), d2 = d/2;	// individual triangle size
 
 				var pA = new THREE.Vector3();
 				var pB = new THREE.Vector3();
@@ -552,8 +606,8 @@
 				
 				colorTracker.update();
 				var object = scene.children[ 0 ];
-				object.rotation.z = -Math.PI /2;
-				object.rotation.y = -Math.PI /4;
+				// object.rotation.z = -Math.PI /2;
+				// object.rotation.y = -Math.PI /4;
 				controls.update();
 				var smoothA = Math.sqrt(params.audioSmoothing);
 				var smoothB = 1 - smoothA;
@@ -571,8 +625,11 @@
 				object.material.uniforms.scale.value = params.scale;
 				object.material.uniforms.sinScale.value = params.sinScale;
 				var color = colorTracker.getColor(analyser.getAverageFrequency(), 100);
+				object.material.uniforms.colorContour.value = params.colorContour;
 				// pointLight.color = color;
 				object.material.uniforms.lightColor.value = new THREE.Vector4(color.r, color.g, color.b, color.a);
+
+				
 				// console.log(camera.position);
 				renderer.render( scene, camera );
 
