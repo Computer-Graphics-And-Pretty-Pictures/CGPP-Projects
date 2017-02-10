@@ -56,6 +56,7 @@
 			uniform float scale;
 			uniform float sinScale;
 			uniform float noiseIterations; 
+			uniform float pointSize; 
 
 
 			attribute vec3 position;
@@ -153,7 +154,7 @@
 	        vec3 noise = vec3(fractalNoise(p.xyz),fractalNoise(p.zyx),fractalNoise(p.yzx));
 	        p = (position) * 0.4 + 0.6 *(sensitivity * sin(noise * sinScale + position.z * 0.000333 + position.y * 0.000333 + position.x * 0.00033 - sinScale)+1.0); //500.0*noise;//
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( p, 1.0 );
-			gl_PointSize = 2.0;
+			gl_PointSize = pointSize;
 
 		}
 
@@ -282,7 +283,9 @@
 						lightColor : { value: new THREE.Vector4(1.0, 1.0, 1.0, 1.0) },
 						sinScale : { value: params.sinScale },
 						scale : { value: params.scale },
-						colorContour : { value: params.colorContour }
+						colorContour : { value: params.colorContour },
+						pointSize : { value: params.pointSize }
+
 					},
 					vertexShader: document.getElementById( 'vertexShader' ).textContent,
 					fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
@@ -362,7 +365,7 @@
 				}
 				f2.add( params, "sinScale", 0.0001, 10.0 ).listen();
 				f2.add( params, "scale", 0.0001, 0.006 ).listen();
-				size = f3.add( params, "size", 1, 50000 ).listen();
+				size = f3.add( params, "size", 1, 30000 ).listen();
 				
 				pointSize = f3.add( params, "pointSize", 1, 100 ).listen();
 				drawStyle = f3.add( params, "style", params.style);
@@ -382,7 +385,7 @@
 				if (selectedGeometry == "Plane") {
 					return new THREE.PlaneBufferGeometry(params.size, params.size, params.detail, params.detail).toNonIndexed();
 				} else if(selectedGeometry == "Sphere") {
-					return new THREE.SphereBufferGeometry(params.size, params.detail, params.detail).toNonIndexed();
+					return new THREE.SphereBufferGeometry(params.size / 2, params.detail, params.detail).toNonIndexed();
 				} else if(selectedGeometry == "Solid Sphere") {
 					return generateSolidSphereGeometry();
 				} else if (selectedGeometry == "Text") {
@@ -464,7 +467,7 @@
 
 			function generateSolidSphereGeometry() {
 				// geometry
-				var triangles = Math.round(params.detail * 10);
+				var triangles = Math.round(params.detail * 100);
 
 				var geometry = new THREE.BufferGeometry();
 
@@ -626,6 +629,7 @@
 				object.material.uniforms.sinScale.value = params.sinScale;
 				var color = colorTracker.getColor(analyser.getAverageFrequency(), 100);
 				object.material.uniforms.colorContour.value = params.colorContour;
+				object.material.uniforms.pointSize.value = params.pointSize;
 				// pointLight.color = color;
 				object.material.uniforms.lightColor.value = new THREE.Vector4(color.r, color.g, color.b, color.a);
 
