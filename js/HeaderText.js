@@ -213,8 +213,8 @@ function render() {
 	//	scrollPos -= 0.3 * scrollVel;	
 	//}
 
-	textMeshes.rotation.x = 0.0002*scrollPos; 
-	textMeshes.position.y = 0.7*scrollPos; 
+	textMeshes.rotation.x = 0.00035*scrollPos; 
+	textMeshes.position.y = 0.05*scrollPos; 
 	textMeshes.traverse( function(current) {
 		if (current.type === 'Mesh') {
 
