@@ -218,7 +218,7 @@ function render() {
 	textMeshes.traverse( function(current) {
 		if (current.type === 'Mesh') {
 
-			current.material.uniforms.amplitude.value = 0.08*scrollPos; //1.0 + Math.sin( time * 0.5 );
+			current.material.uniforms.amplitude.value = 0.06*scrollPos; //1.0 + Math.sin( time * 0.5 );
 			current.material.uniforms.gTime.value = time;
 		}
 		
