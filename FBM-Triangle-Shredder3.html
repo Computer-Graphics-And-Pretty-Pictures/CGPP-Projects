@@ -60,8 +60,10 @@
 			uniform float pointSize; 
 
 
-			attribute vec3 position;
-			attribute vec3 normal;
+			attribute vec3 positionA;
+			attribute vec3 normalA;
+			attribute vec3 positionB;
+			attribute vec3 normalB;
 			attribute vec4 color;
 
 			varying vec3 vPosition;
@@ -140,18 +142,18 @@
 		        }
 		        return f;
 		    }
-
+		    
 	  		/// END NOISE CODE
 
 		void main()	{
 
-			vPosition = position;
+			vPosition = positionA;
 			vColor = color;
 
-	        vec3 p = position;
+	        vec3 p = positionA;
 	        vec3 noise = vec3(fractalNoise(p.xyz),fractalNoise(p.zyx),fractalNoise(p.yzx))-0.5;
-	        vNormal = (normal) + amplitude * sin( noise * sinScale );
-	        p = (position) + amplitude * sin( noise * sinScale);
+	        vNormal = (normalA) + amplitude * sin( noise * sinScale );
+	        p = (p) + amplitude * sin( noise * sinScale);
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( p, 1.0 );
 			gl_PointSize = pointSize;
 
@@ -218,8 +220,8 @@
 			var camera, scene, renderer, controls;
 			var listener, audioLoader, audioArray, bufferLength, analyser, smoothVolume;
 			var pointLight, skyBox;
-			var gui, params, detail, pointSize, size, drawStyle, startingShape, selectedGeometry;
-			var sound, playAudio, volume, geometry, material, mesh;
+			var gui, params, detail, pointSize, size, drawStyle, GeometryA, GeometryB, selectedGeometry;
+			var sound, playAudio, volume, geometry, material, noiseShape, noiseGeometry;
 			var colorTracker;
 
 			var loader = new THREE.FontLoader();
@@ -228,6 +230,7 @@
 				font = loadedFont;
 			} );	
 			init();
+			console.log(scene.children[0]);
 			animate();		
 
 			function init() {
@@ -273,6 +276,13 @@
 				}
 		        smoothVolume = 0.0;       
 		        var geometry = geometryType();
+		        noiseGeometry = new THREE.BufferGeometry();
+		 		noiseGeometry.addAttribute( "positionA", geometry.getAttribute( "position" ));
+		 		noiseGeometry.addAttribute( "normalA", geometry.getAttribute("normal"));
+		 		noiseGeometry.addAttribute( "positionB", geometry.getAttribute( "position" ));
+		 		noiseGeometry.addAttribute( "normalB", geometry.getAttribute("normal"));
+		 		noiseGeometry.computeBoundingSphere();
+		 		noiseGeometry.needsUpdate = true;
 
 				material = new THREE.RawShaderMaterial( {
 
@@ -293,11 +303,13 @@
 					vertexShader: document.getElementById( 'vertexShader' ).textContent,
 					fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
 					side: THREE.DoubleSide,
-					transparent: true,
-					derivatives: true
+					transparent: true
 				} );
-				mesh = new THREE.LineSegments( geometry, material );
-				scene.add( mesh );
+
+
+				noiseShape = new THREE.Mesh(new THREE.BoxGeometry(), new THREE.MeshNormalMaterial());//new THREE.LineSegments( noiseGeometry, material );
+				scene.add( noiseShape );
+				
 
 				pointLight = new THREE.PointLight(0xFFFFFF, 1.0);
 				scene.add(pointLight);
@@ -346,7 +358,8 @@
 					opacity : 0.5,
 					style : ['Points', 'Line', 'Mesh'],
 					text : "CGPP",
-					startingShape : ['Plane', 'Sphere', 'Solid Sphere', 'Text']
+					GeometryA : ['Plane', 'Sphere', 'Solid Sphere', 'Text'],
+					GeometryB : ['Plane', 'Sphere', 'Solid Sphere', 'Text']
 				};
 				gui = new dat.GUI();
 				var f1 = gui.addFolder('Lights');
@@ -376,7 +389,8 @@
 				
 				pointSize = f3.add( params, "pointSize", 1, 100 ).listen();
 				drawStyle = f3.add( params, "style", params.style);
-				startingShape = f3.add( params, "startingShape", params.startingShape);
+				GeometryA = f3.add( params, "GeometryA", params.GeometryA);
+				GeometryB = f3.add( params, "GeometryB", params.GeometryB);
 				f3.add( params, "text", params.text );
 				var f4 = gui.addFolder('Audio');
 				f4.add( params, "audioSmoothing", 0.0, 0.9).listen();
@@ -392,9 +406,9 @@
 			function geometryType() {
 				if (selectedGeometry == "Plane") {
 					return new THREE.PlaneBufferGeometry(
-						params.size, params.size, params.detail, params.detail);//.toNonIndexed();
+						params.size, params.size, params.detail, params.detail).toNonIndexed();
 				} else if(selectedGeometry == "Sphere") {
-					return new THREE.SphereBufferGeometry(params.size / 2, params.detail, params.detail);//.toNonIndexed();
+					return new THREE.SphereBufferGeometry(params.size / 2, params.detail, params.detail).toNonIndexed();
 				} else if(selectedGeometry == "Solid Sphere") {
 					return generateSolidSphereGeometry();
 				} else if (selectedGeometry == "Text") {
@@ -425,39 +439,61 @@
 				return new THREE.BufferGeometry().fromGeometry( geometry );
 			}
 
-			startingShape.onChange(function(value) {
+			GeometryA.onChange( function(value) {
 				selectedGeometry = value;
-				scene.children[ 0 ].geometry = geometryType();
-				scene.children[ 0 ].geometry.needsUpdate = true;
+				updateA();
 			});
 
+			GeometryB.onChange( function (value) {
+				selectedGeometry = value;
+				updateB();
+			});
+
+			function updateA () {
+				var geo = geometryType();
+				noiseGeometry.removeAttribute( "positionA" );
+				noiseGeometry.removeAttribute( "normalA" );
+				noiseGeometry.addAttribute( "positionA", geo.getAttribute( "position" ));
+		 		noiseGeometry.addAttribute( "normalA", geo.getAttribute("normal"));
+				noiseShape.geometry.needsUpdate = true;
+			}
+
+			function updateB () {
+				var geo = geometryType();
+				noiseGeometry.removeAttribute( "positionB" );
+				noiseGeometry.removeAttribute( "normalB" );
+				noiseGeometry.addAttribute( "positionB", geo.getAttribute( "position" ));
+		 		noiseGeometry.addAttribute( "normalB", geo.getAttribute("normal"));
+				noiseShape.geometry.needsUpdate = true;
+			}
+
 			drawStyle.onChange(function(value) {
+				updateA();
+				updateB();
 				if(value == "Points") {
-					scene.children[ 0 ] = new THREE.Points( geometryType(), material );
+					noiseShape = new THREE.Points( noiseGeometry, material );
 				} else if(value == "Line") {
-					scene.children[ 0 ] = new THREE.LineSegments( geometryType(), material );
+					noiseShape = new THREE.LineSegments( noiseGeometry, material );
 				} else {
-					scene.children[ 0 ] = new THREE.Mesh( geometryType(), material );
+					noiseShape = new THREE.Mesh( noiseGeometry, material );
 				}
 				
 			});
 
 			//Dat.gui callback methods
 			detail.onChange(function(value) {
-				
-				scene.children[ 0 ].geometry = geometryType();
-				
-				scene.children[ 0 ].geometry.needsUpdate = true;
+				updateA();
+				updateB();
 			});
 
 			size.onChange(function(value) {
-				scene.children[ 0 ].geometry = geometryType();
-				scene.children[ 0 ].geometry.needsUpdate = true;
+				updateA();
+				updateB();
 			});
 
 			pointSize.onChange(function(value) {
-				scene.children[ 0 ].geometry = geometryType();
-				scene.children[ 0 ].geometry.needsUpdate = true;
+				updateA();
+				updateB();
 			});
 			
 			volume.onChange(function(value) {
@@ -617,7 +653,7 @@
 				var time = performance.now();
 				
 				colorTracker.update();
-				var object = scene.children[ 0 ];
+				var object = noiseShape;
 				// object.rotation.z = -Math.PI /2;
 				// object.rotation.y = -Math.PI /4;
 				controls.update();
@@ -629,6 +665,7 @@
 				for(var i = 0; i < audioArray.length; i++) {
 					audioArray[i] = smoothA * audioArray[i] + smoothB * freshAudio[i]; 
 				}
+
 				camera.lookAt(object.position);
 				object.material.uniforms.audio.value = audioArray;
 				object.material.uniforms.time.value += (time * 0.000005) * 0.7 + smoothVolume * smoothVolume * params.time;
