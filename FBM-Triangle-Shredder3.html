@@ -217,6 +217,7 @@
 
 			var camera, scene, renderer, controls;
 			var listener, audioLoader, audioArray, bufferLength, analyser, smoothVolume;
+			var audioCtx, source, stream, useMicrophone, micAnalyser, micData;
 			var pointLight, skyBox;
 			var gui, params, detail, pointSize, size, drawStyle, startingShape, selectedGeometry;
 			var sound, playAudio, volume, geometry, material, mesh;
@@ -265,7 +266,35 @@
 				function ( xhr ) {
 					console.log( 'An error happened' );
 				});
+    			navigator.getUserMedia = (navigator.getUserMedia ||
+              			  navigator.webkitGetUserMedia ||
+              			  navigator.mozGetUserMedia ||
+              			  navigator.msGetUserMedia);
+				audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+				var source, stream;
+				micAnalyser = audioCtx.createAnalyser();
+				// micAnalyser.minDecibels = -90;
+				// micAnalyser.maxDecibels = -10;
+				// micAnalyser.smoothingTimeConstant = 0.85;
+				if (navigator.getUserMedia) {
+				   console.log('getUserMedia supported.');
+				   navigator.getUserMedia (
+				      {audio: true},
+				      function(stream) {
+				         source = audioCtx.createMediaStreamSource(stream);
+				         source.connect(micAnalyser);
+				      },
+				      // Error callback
+				      function(err) {
+				         console.log('The following gUM error occured: ' + err);
+				      });
+				} else {
+				   console.log('getUserMedia not supported on your browser!');
+				}
+
 		        bufferLength = 64;
+		        micAnalyser.bufferLength = bufferLength;
+		        micData = new Uint8Array(bufferLength);
 		        analyser = new THREE.AudioAnalyser( sound, bufferLength );
 		        audioArray = new Array(bufferLength);// Uint8Array(bufferLength); 
 		        for(var i = 0; i < audioArray.length; i++) {
@@ -339,11 +368,13 @@
 					detail : 250,
 					pointSize : 1,
 					playAudio : false,
+					useMicrophone : false,
 					scale : 0.6,
 					sinScale : 0.2,
 					volume : 0.5,
 					colorContour : 3.0, 
 					opacity : 0.5,
+					saturation : 0.8,
 					style : ['Points', 'Line', 'Mesh'],
 					text : "CGPP",
 					startingShape : ['Plane', 'Sphere', 'Solid Sphere', 'Text']
@@ -353,6 +384,7 @@
 				f1.add( params, "pointLightIntensity", 0.0, 0.5 ).listen();
 				f1.add( params, "colorContour", 0.1, 20.0 ).listen();
 				f1.add( params, "opacity", 0.0, 1.0 ).listen();
+				f1.add( params, "saturation", 0.0, 1.0 ).listen();
 				var f2 = gui.addFolder('Noise');
 				f2.add( params, "time", -2.0, 4.0 ).listen();
 				var f3 = gui.addFolder('Geometry');
@@ -374,7 +406,7 @@
 				f2.add( params, "scale", 0.01, 0.6 ).listen();
 				size = f3.add( params, "size", 1, 3000 ).listen();
 				
-				pointSize = f3.add( params, "pointSize", 1, 100 ).listen();
+				pointSize = f3.add( params, "pointSize", 1, 10 ).listen();
 				drawStyle = f3.add( params, "style", params.style);
 				startingShape = f3.add( params, "startingShape", params.startingShape);
 				f3.add( params, "text", params.text );
@@ -382,6 +414,7 @@
 				f4.add( params, "audioSmoothing", 0.0, 0.9).listen();
 				volume = f4.add( params, "volume", 0.0, 0.5).listen();
 				playAudio = f4.add( params, "playAudio").listen();
+				useMicrophone = f4.add( params, "useMicrophone").listen();
 				f2.open();
 				f3.open();
 
@@ -473,6 +506,15 @@
 				}
 				
 			});
+
+			useMicrophone.onChange(function(shouldUseMic) {
+				if(shouldUseMic) {
+					sound.pause;
+
+				} else {
+
+				}
+			})
 
 			function generateSolidSphereGeometry() {
 				// geometry
@@ -625,27 +667,45 @@
 				var smoothB = 1 - smoothA;
 		        smoothVolume = smoothB * analyser.getAverageFrequency() * 0.01 + smoothA * smoothVolume;
 		        pointLight.intensity = smoothVolume * params.pointLightIntensity;
-		        var freshAudio = analyser.getFrequencyData();
+
+		        var freshAudio, color;
+		        var averageFrequency;
+		        if(params.useMicrophone) {
+		        	micAnalyser.getByteFrequencyData(micData);
+		        	freshAudio = new Array(micData.length);
+		        	var sum = 0;
+		        	for(var i = 0; i < freshAudio.length; i++) {
+		        		freshAudio[i] = micData[i] * 2.0;
+		        		sum += freshAudio[i];
+		        	}
+		        	averageFrequency = sum / freshAudio.length / 2.0;
+		        	console.log(averageFrequency);
+		        	color = colorTracker.getColor(averageFrequency, 100);
+		        } else {
+		        	freshAudio = analyser.getFrequencyData();
+		        	color = colorTracker.getColor(analyser.getAverageFrequency(), 100);
+		        }
 				for(var i = 0; i < audioArray.length; i++) {
 					audioArray[i] = smoothA * audioArray[i] + smoothB * freshAudio[i]; 
 				}
-				camera.lookAt(object.position);
-				object.material.uniforms.audio.value = audioArray;
-				object.material.uniforms.time.value += (time * 0.000005) * 0.7 + smoothVolume * smoothVolume * params.time;
-				object.material.uniforms.sensitivity.value = params.sensitivity;
-				object.material.uniforms.amplitude.value = params.amplitude;
-				object.material.uniforms.noiseIterations.value = params.noiseIterations;
-				object.material.uniforms.scale.value = 0.01*params.scale;
-				object.material.uniforms.sinScale.value = params.sinScale;
-				var color = colorTracker.getColor(analyser.getAverageFrequency(), 100);
-				object.material.uniforms.colorContour.value = params.colorContour;
-				object.material.uniforms.opacity.value = params.opacity;
-				object.material.uniforms.pointSize.value = params.pointSize;
-				// pointLight.color = color;
-				object.material.uniforms.lightColor.value = new THREE.Vector4(color.r, color.g, color.b, color.a);
 
-				
-				// console.log(camera.position);
+				var hsl = color.getHSL();
+				color.setHSL(hsl.h, params.saturation, hsl.l);
+				camera.lookAt(object.position);
+
+				var objUniforms = object.material.uniforms;
+				objUniforms.audio.value = audioArray;
+				objUniforms.time.value += (time * 0.000005) * 0.7 + smoothVolume * smoothVolume * params.time;
+				objUniforms.sensitivity.value = params.sensitivity;
+				object.material.uniforms.amplitude.value = params.amplitude;
+				objUniforms.noiseIterations.value = params.noiseIterations;
+				objUniforms.scale.value = 0.01 * params.scale;
+				objUniforms.sinScale.value = params.sinScale;
+				objUniforms.colorContour.value = params.colorContour;
+				objUniforms.opacity.value = params.opacity;
+				objUniforms.pointSize.value = params.pointSize;
+				objUniforms.lightColor.value = new THREE.Vector4(color.r, color.g, color.b, color.a);
+
 				renderer.render( scene, camera );
 
 			}
