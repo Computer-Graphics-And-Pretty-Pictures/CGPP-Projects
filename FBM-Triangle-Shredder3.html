@@ -175,7 +175,6 @@
 			varying vec3 vNormal;
 			varying vec4 vColor;
 
-
 			void main()	{
 				vec3 lightDir = normalize(vec3(1.0, 0.0, 0.0));
 				
@@ -384,9 +383,10 @@
 
 			function geometryType() {
 				if (selectedGeometry == "Plane") {
-					return new THREE.PlaneBufferGeometry(params.size, params.size, params.detail, params.detail).toNonIndexed();
+					return new THREE.PlaneBufferGeometry(
+						params.size, params.size, params.detail, params.detail);//.toNonIndexed();
 				} else if(selectedGeometry == "Sphere") {
-					return new THREE.SphereBufferGeometry(params.size / 2, params.detail, params.detail).toNonIndexed();
+					return new THREE.SphereBufferGeometry(params.size / 2, params.detail, params.detail);//.toNonIndexed();
 				} else if(selectedGeometry == "Solid Sphere") {
 					return generateSolidSphereGeometry();
 				} else if (selectedGeometry == "Text") {
@@ -427,7 +427,7 @@
 				if(value == "Points") {
 					scene.children[ 0 ] = new THREE.Points( geometryType(), material );
 				} else if(value == "Line") {
-					scene.children[ 0 ] = new THREE.Line( geometryType(), material );
+					scene.children[ 0 ] = new THREE.LineSegments( geometryType(), material );
 				} else {
 					scene.children[ 0 ] = new THREE.Mesh( geometryType(), material );
 				}
