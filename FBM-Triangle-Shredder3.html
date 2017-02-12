@@ -170,6 +170,7 @@
 			uniform float sensitivity;
 			uniform vec4 lightColor;
 			uniform float colorContour;
+			uniform float opacity;
 
 			varying vec3 vPosition;
 			varying vec3 vNormal;
@@ -182,7 +183,7 @@
         		color *= dot(normalize(vNormal),lightDir);
         		color = 0.5 * sin(color * colorContour) + 0.5;
 				// color.r += sin( vPosition.x * 10.0 + time ) * 0.5;
-				color.a *= 0.5;
+				color.a = opacity;
 				gl_FragColor = color;
 				
 				/*
@@ -284,6 +285,7 @@
 						sinScale : { value: params.sinScale },
 						scale : { value: params.scale },
 						colorContour : { value: params.colorContour },
+						opacity : { value: params.opacity },
 						pointSize : { value: params.pointSize }
 
 					},
@@ -340,6 +342,7 @@
 					sinScale : 0.2,
 					volume : 0.5,
 					colorContour : 3.0, 
+					opacity : 0.5,
 					style : ['Points', 'Line', 'Mesh'],
 					text : "CGPP",
 					startingShape : ['Plane', 'Sphere', 'Solid Sphere', 'Text']
@@ -348,6 +351,7 @@
 				var f1 = gui.addFolder('Lights');
 				f1.add( params, "pointLightIntensity", 0.0, 0.5 ).listen();
 				f1.add( params, "colorContour", 0.1, 20.0 ).listen();
+				f1.add( params, "opacity", 0.0, 1.0 ).listen();
 				var f2 = gui.addFolder('Noise');
 				f2.add( params, "time", -2.0, 4.0 ).listen();
 				var f3 = gui.addFolder('Geometry');
@@ -630,6 +634,7 @@
 				object.material.uniforms.sinScale.value = params.sinScale;
 				var color = colorTracker.getColor(analyser.getAverageFrequency(), 100);
 				object.material.uniforms.colorContour.value = params.colorContour;
+				object.material.uniforms.opacity.value = params.opacity;
 				object.material.uniforms.pointSize.value = params.pointSize;
 				// pointLight.color = color;
 				object.material.uniforms.lightColor.value = new THREE.Vector4(color.r, color.g, color.b, color.a);
