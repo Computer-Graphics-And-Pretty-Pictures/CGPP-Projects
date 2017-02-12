@@ -43,7 +43,7 @@
 		<script src="js/ExplodeModifier.js"></script>
 		<script src="js/TessellateModifier.js"></script>
 
-		<script id="vertexShader" type="x-shader/x-vertex">
+		<script id="vertexShader" type="x-shader/x-vertex" src=>
 
 			precision mediump float;
 			precision mediump int;
@@ -51,13 +51,15 @@
 			uniform mat4 modelViewMatrix; // optional
 			uniform mat4 projectionMatrix; // optional
 			uniform float time;
-			uniform float audio[64];
+			uniform float audio[16];
 			uniform float sensitivity;
 			uniform float amplitude;
 			uniform float scale;
 			uniform float sinScale;
 			uniform float noiseIterations; 
 			uniform float pointSize; 
+			uniform float highFrequencyMix;
+			uniform vec2 mouse;
 
 
 			attribute vec3 position;
@@ -128,7 +130,7 @@
 		    {
 		        float f = 0.0;
 		        float a = 0.5;
-		        p = p + vec3(0.4, 0.0, 1.0) * time * 5.02;
+		        p = p + vec3(0.0, 0.5, 0.0) * time * 5.02;
 		        p = p * scale;
 		        for (float i = 0.0; i < 8.0; i++ ) {
 		        	if( i > noiseIterations) {
@@ -136,7 +138,7 @@
 		        	}
 		            f += a * simplex3d(p) * sqrt(sensitivity) * (pow( 0.003906 * audio[int(i)], sensitivity));
 		            p *= 2.0;
-		            a *= 0.5;
+		            a *= highFrequencyMix;
 		        }
 		        return f;
 		    }
@@ -152,6 +154,11 @@
 	        vec3 noise = vec3(fractalNoise(p.xyz),fractalNoise(p.zyx),fractalNoise(p.yzx))-0.5;
 	        vNormal = (normal) + amplitude * sin( noise * sinScale );
 	        p = (position) + amplitude * sin( noise * sinScale);
+	        //float dist = distance(p, vec3(mouse * 300.0-300.0, 0.0));
+	        // p.x += ;
+	        //p = mix(p, vec3(mouse * 300.0-300.0, 0.0), 1.0/dist);
+	        //p.z += 20000.0 / (1.0+dist);
+
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( p, 1.0 );
 			gl_PointSize = pointSize;
 
@@ -212,7 +219,7 @@
 			var audioCtx, source, stream, useMicrophone, micAnalyser, micData;
 			var pointLight, skyBox;
 			var gui, params, detail, pointSize, size, drawStyle, startingShape, selectedGeometry;
-			var sound, playAudio, volume, geometry, material, mesh;
+			var sound, playAudio, volume, geometry, material, mesh, mouse;
 			var colorTracker;
 
 			var loader = new THREE.FontLoader();
@@ -234,6 +241,9 @@
 				scene = new THREE.Scene();
 
 				colorTracker = new ColorTracker();
+
+				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				mouse = new THREE.Vector2();
 
 				initGui();
 				
@@ -284,11 +294,11 @@
 				   console.log('getUserMedia not supported on your browser!');
 				}
 
-		        bufferLength = 64;
+		        bufferLength = 32;
 		        micAnalyser.bufferLength = bufferLength;
 		        micData = new Uint8Array(bufferLength);
 		        analyser = new THREE.AudioAnalyser( sound, bufferLength );
-		        audioArray = new Array(bufferLength);// Uint8Array(bufferLength); 
+		        audioArray = new Array(16);// Uint8Array(bufferLength); 
 		        for(var i = 0; i < audioArray.length; i++) {
 					audioArray[i] = 0.0;
 				}
@@ -308,7 +318,9 @@
 						scale : { value: params.scale },
 						colorContour : { value: params.colorContour },
 						opacity : { value: params.opacity },
-						pointSize : { value: params.pointSize }
+						pointSize : { value: params.pointSize },
+						highFrequencyMix : {value : params.highFrequencyMix },
+						mouse : {value : mouse }
 
 					},
 					vertexShader: document.getElementById( 'vertexShader' ).textContent,
@@ -355,6 +367,7 @@
 					pointLightIntensity : 0.15,
 					time : 0.3,
 					noiseIterations : 6.0,
+					highFrequencyMix : 0.7,
 					audioSmoothing: 0.8,
 					size : 800,
 					detail : 250,
@@ -396,6 +409,7 @@
 				}
 				f2.add( params, "sinScale", 0.0001, 0.8 ).listen();
 				f2.add( params, "scale", 0.01, 0.6 ).listen();
+				f2.add( params, "highFrequencyMix", 0.01, 1.0 ).listen();
 				size = f3.add( params, "size", 1, 3000 ).listen();
 				
 				pointSize = f3.add( params, "pointSize", 1, 10 ).listen();
@@ -501,12 +515,17 @@
 
 			useMicrophone.onChange(function(shouldUseMic) {
 				if(shouldUseMic) {
-					sound.pause;
+					sound.pause();
 					params.playAudio = false;
 				} else {
 
 				}
-			})
+			});
+
+			function onDocumentMouseMove(event) {
+				mouse.x = ( event.clientX / window.innerWidth );
+				mouse.y = ( event.clientY / window.innerHeight );
+			}			
 
 			function generateSolidSphereGeometry() {
 				// geometry
@@ -667,7 +686,7 @@
 		        	freshAudio = new Array(micData.length);
 		        	var sum = 0;
 		        	for(var i = 0; i < freshAudio.length; i++) {
-		        		freshAudio[i] = micData[i] * 2.0;
+		        		freshAudio[i] = micData[i];
 		        		sum += freshAudio[i];
 		        	}
 		        	averageFrequency = sum / freshAudio.length / 2.0;
@@ -677,25 +696,35 @@
 		        	freshAudio = analyser.getFrequencyData();
 		        	color = colorTracker.getColor(analyser.getAverageFrequency(), 100);
 		        }
-				for(var i = 0; i < audioArray.length; i++) {
-					audioArray[i] = smoothA * audioArray[i] + smoothB * freshAudio[i]; 
+
+		        
+		        var index = 0;
+				for(var i = 0; i < freshAudio.length; i+=2) {
+					var averagedAudio = (freshAudio[i] + 
+										freshAudio[i + 1]) / 2.0; 
+										//freshAudio[i + 2] +
+										//freshAudio[i + 3]) / 4.0;
+					//audio smoothing
+					audioArray[index] = smoothA * averagedAudio + smoothB * freshAudio[index]; 
+					index +=1;
 				}
 
 				var hsl = color.getHSL();
 				color.setHSL(hsl.h, params.saturation, hsl.l);
-				camera.lookAt(object.position);
 
 				var objUniforms = object.material.uniforms;
 				objUniforms.audio.value = audioArray;
 				objUniforms.time.value += (time * 0.000005) * 0.7 + smoothVolume * smoothVolume * params.time;
 				objUniforms.sensitivity.value = params.sensitivity;
-				object.material.uniforms.amplitude.value = params.amplitude;
+				objUniforms.amplitude.value = params.amplitude;
 				objUniforms.noiseIterations.value = params.noiseIterations;
 				objUniforms.scale.value = 0.01 * params.scale;
 				objUniforms.sinScale.value = params.sinScale;
 				objUniforms.colorContour.value = params.colorContour;
 				objUniforms.opacity.value = params.opacity;
 				objUniforms.pointSize.value = params.pointSize;
+				objUniforms.highFrequencyMix.value = params.highFrequencyMix;
+				objUniforms.mouse.value = mouse;
 				objUniforms.lightColor.value = new THREE.Vector4(color.r, color.g, color.b, color.a);
 
 				renderer.render( scene, camera );
