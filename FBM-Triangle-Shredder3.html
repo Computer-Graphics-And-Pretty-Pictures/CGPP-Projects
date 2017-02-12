@@ -129,7 +129,7 @@
 		        float a = 0.5;
 		        p = p + vec3(0.4, 0.0, 1.0) * time * 5.02;
 		        p = p * scale;
-		        for (float i = 0.0; i < 32.0; i++ ) {
+		        for (float i = 0.0; i < 8.0; i++ ) {
 		        	if( i > noiseIterations) {
 		        		break;
 		        	}
@@ -360,7 +360,7 @@
 					detail = f3.add( params, "detail", 1, 1000 ).listen();
 				} else {
 					f2.add( params, "sensitivity", 1.0, 1500.0 ).listen();
-					f2.add( params, "noiseIterations", 1.0, 32.0 ).listen();
+					f2.add( params, "noiseIterations", 1.0, 8.0 ).listen();
 					detail = f3.add( params, "detail", 1, 1000 ).listen();
 				}
 				f2.add( params, "sinScale", 0.0001, 10.0 ).listen();
