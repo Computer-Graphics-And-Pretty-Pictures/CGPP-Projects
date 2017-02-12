@@ -58,10 +58,11 @@
 			uniform float sinScale;
 			uniform float noiseIterations; 
 			uniform float pointSize; 
+			uniform float abMix;
 
 
-			attribute vec3 positionA;
-			attribute vec3 normalA;
+			attribute vec3 position;
+			attribute vec3 normal;
 			attribute vec3 positionB;
 			attribute vec3 normalB;
 			attribute vec4 color;
@@ -147,12 +148,12 @@
 
 		void main()	{
 
-			vPosition = positionA;
+			vPosition = mix(position, positionB, abMix);
 			vColor = color;
 
-	        vec3 p = positionA;
+	        vec3 p = mix(position, positionB, abMix);
 	        vec3 noise = vec3(fractalNoise(p.xyz),fractalNoise(p.zyx),fractalNoise(p.yzx))-0.5;
-	        vNormal = (normalA) + amplitude * sin( noise * sinScale );
+	        vNormal = mix(normal, normalB, abMix) + amplitude * sin( noise * sinScale );
 	        p = (p) + amplitude * sin( noise * sinScale);
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( p, 1.0 );
 			gl_PointSize = pointSize;
@@ -186,17 +187,8 @@
 	        	}
 				// color.r += sin( vPosition.x * 10.0 + time ) * 0.5;
 				color.a = opacity;
-				gl_FragColor = color;
+				gl_FragColor = vec4( color );
 				
-				/*
-				vec3 dx = dFdx(vPosition);
-				vec3 dy = dFdy(vPosition);
-				vec3 norm = normalize(cross(dx,dy));
-				vec3 color = vec3(0.9, 0.2, 0.1);
-				color *= dot(normalize(norm),lightDir);
-				
-				gl_FragColor = vec4(color,0.2);
-				*/
 			}
 
 		</script>
@@ -298,10 +290,10 @@
 		        smoothVolume = 0.0;       
 		        var geometry = geometryType();
 		        noiseGeometry = new THREE.BufferGeometry();
-		 		noiseGeometry.addAttribute( "positionA", geometry.getAttribute( "position" ));
-		 		noiseGeometry.addAttribute( "normalA", geometry.getAttribute("normal"));
-		 		noiseGeometry.addAttribute( "positionB", geometry.getAttribute( "position" ));
-		 		noiseGeometry.addAttribute( "normalB", geometry.getAttribute("normal"));
+		 		noiseGeometry.addAttribute( "position", new THREE.BufferAttribute( geometry.getAttribute( "position" ).array, 3));
+		 		noiseGeometry.addAttribute( "normal", new THREE.BufferAttribute( geometry.getAttribute("normal").array, 3));
+		 		noiseGeometry.addAttribute( "positionB", new THREE.BufferAttribute( geometry.getAttribute( "position" ).array, 3));
+		 		noiseGeometry.addAttribute( "normalB", new THREE.BufferAttribute( geometry.getAttribute("normal").array, 3));
 		 		noiseGeometry.computeBoundingSphere();
 		 		noiseGeometry.needsUpdate = true;
 
@@ -316,6 +308,7 @@
 						lightColor : { value: new THREE.Vector4(1.0, 1.0, 1.0, 1.0) },
 						sinScale : { value: params.sinScale },
 						scale : { value: params.scale },
+						abMix : { value : params.abMix },
 						colorContour : { value: params.colorContour },
 						opacity : { value: params.opacity },
 						pointSize : { value: params.pointSize }
@@ -328,7 +321,7 @@
 				} );
 
 
-				noiseShape = new THREE.Mesh(new THREE.BoxGeometry(), new THREE.MeshNormalMaterial());//new THREE.LineSegments( noiseGeometry, material );
+				noiseShape = new THREE.LineSegments( noiseGeometry, material );
 				scene.add( noiseShape );
 				
 
@@ -374,6 +367,7 @@
 					playAudio : false,
 					useMicrophone : false,
 					scale : 0.6,
+					abMix : 0.0,
 					sinScale : 0.2,
 					volume : 0.5,
 					colorContour : 3.0, 
@@ -409,6 +403,7 @@
 				}
 				f2.add( params, "sinScale", 0.0001, 0.8 ).listen();
 				f2.add( params, "scale", 0.01, 0.6 ).listen();
+				f2.add( params, "abMix", 0.0, 1.0 ).listen();
 				size = f3.add( params, "size", 1, 3000 ).listen();
 				
 				pointSize = f3.add( params, "pointSize", 1, 10 ).listen();
@@ -476,25 +471,52 @@
 
 			function updateA () {
 				var geo = geometryType();
-				noiseGeometry.removeAttribute( "positionA" );
-				noiseGeometry.removeAttribute( "normalA" );
-				noiseGeometry.addAttribute( "positionA", geo.getAttribute( "position" ));
-		 		noiseGeometry.addAttribute( "normalA", geo.getAttribute("normal"));
+				var count = noiseGeometry.getAttribute( "position" ).count * 3;
+				noiseGeometry.removeAttribute( "position" );
+				noiseGeometry.removeAttribute( "normal" );
+				var newP = new Float32Array( count );
+				var pArr = geo.getAttribute("position").array;
+				var newCount = Math.min( geo.getAttribute("position").count * 3, count);
+				for (var i = 0; i < newCount; i++ ) {
+					newP[i] = pArr[i];
+				}
+				var newN = new Float32Array( count );
+				var nArr = geo.getAttribute("normal").array;
+				newCount = Math.min( geo.getAttribute("normal").count * 3, count);
+				for (var i = 0; i < newCount; i++ ) {
+					newN[i] = nArr[i];
+				}
+ 				noiseGeometry.addAttribute( "position", new THREE.BufferAttribute( newP, 3));
+		 		noiseGeometry.addAttribute( "normal", new THREE.BufferAttribute( newN, 3));
 				noiseShape.geometry.needsUpdate = true;
 			}
 
 			function updateB () {
 				var geo = geometryType();
+				var count = noiseGeometry.getAttribute( "positionB" ).count * 3;
 				noiseGeometry.removeAttribute( "positionB" );
 				noiseGeometry.removeAttribute( "normalB" );
-				noiseGeometry.addAttribute( "positionB", geo.getAttribute( "position" ));
-		 		noiseGeometry.addAttribute( "normalB", geo.getAttribute("normal"));
+				var newP = new Float32Array( count );
+				var pArr = geo.getAttribute("position").array;
+				var newCount = Math.min( geo.getAttribute("position").count * 3, count);
+				for (var i = 0; i < newCount; i++ ) {
+					newP[i] = pArr[i];
+				}
+				var newN = new Float32Array( count );
+				var nArr = geo.getAttribute("normal").array;
+				newCount = Math.min( geo.getAttribute("normal").count * 3, count);
+				for (var i = 0; i < newCount; i++ ) {
+					newN[i] = nArr[i];
+				}
+ 				noiseGeometry.addAttribute( "positionB", new THREE.BufferAttribute( newP, 3));
+		 		noiseGeometry.addAttribute( "normalB", new THREE.BufferAttribute( newN, 3));
 				noiseShape.geometry.needsUpdate = true;
 			}
 
 			drawStyle.onChange(function(value) {
 				updateA();
 				updateB();
+				scene.remove(noiseShape);
 				if(value == "Points") {
 					noiseShape = new THREE.Points( noiseGeometry, material );
 				} else if(value == "Line") {
@@ -502,7 +524,7 @@
 				} else {
 					noiseShape = new THREE.Mesh( noiseGeometry, material );
 				}
-				
+				scene.add(noiseShape);
 			});
 
 			//Dat.gui callback methods
@@ -517,8 +539,9 @@
 			});
 
 			pointSize.onChange(function(value) {
-				updateA();
-				updateB();
+				console.log(scene.children[0]);
+			//	updateA();
+			//	updateB();
 			});
 			
 			volume.onChange(function(value) {
@@ -721,7 +744,7 @@
 				color.setHSL(hsl.h, params.saturation, hsl.l);
 
 				camera.lookAt(object.position);
-
+				
 				var objUniforms = object.material.uniforms;
 				objUniforms.audio.value = audioArray;
 				objUniforms.time.value += (time * 0.000005) * 0.7 + smoothVolume * smoothVolume * params.time;
@@ -729,12 +752,13 @@
 				object.material.uniforms.amplitude.value = params.amplitude;
 				objUniforms.noiseIterations.value = params.noiseIterations;
 				objUniforms.scale.value = 0.01 * params.scale;
+				objUniforms.abMix.value = params.abMix;
 				objUniforms.sinScale.value = params.sinScale;
 				objUniforms.colorContour.value = params.colorContour;
 				objUniforms.opacity.value = params.opacity;
 				objUniforms.pointSize.value = params.pointSize;
 				objUniforms.lightColor.value = new THREE.Vector4(color.r, color.g, color.b, color.a);
-
+				
 				renderer.render( scene, camera );
 
 			}
