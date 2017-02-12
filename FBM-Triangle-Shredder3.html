@@ -53,6 +53,7 @@
 			uniform float time;
 			uniform float audio[64];
 			uniform float sensitivity;
+			uniform float amplitude;
 			uniform float scale;
 			uniform float sinScale;
 			uniform float noiseIterations; 
@@ -133,7 +134,7 @@
 		        	if( i > noiseIterations) {
 		        		break;
 		        	}
-		            f += a * simplex3d(p) * 0.01 * audio[int(i)];
+		            f += a * simplex3d(p) * sqrt(sensitivity) * (pow( 0.003906 * audio[int(i)], sensitivity));
 		            p *= 2.0;
 		            a *= 0.5;
 		        }
@@ -148,9 +149,9 @@
 			vColor = color;
 
 	        vec3 p = position;
-	        vec3 noise = vec3(fractalNoise(p.xyz),fractalNoise(p.zyx),fractalNoise(p.yzx))-1.0;
-	        vNormal = (normal) * 0.4 + 0.6 *(sensitivity * sin(noise * sinScale )+1.0);
-	        p = (position) * 0.4 + 0.6 *(sensitivity * sin(noise * sinScale)+1.0);
+	        vec3 noise = vec3(fractalNoise(p.xyz),fractalNoise(p.zyx),fractalNoise(p.yzx))-0.5;
+	        vNormal = (normal) + amplitude * sin( noise * sinScale );
+	        p = (position) + amplitude * sin( noise * sinScale);
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( p, 1.0 );
 			gl_PointSize = pointSize;
 
@@ -249,7 +250,7 @@
 		        
 		        sound = new THREE.Audio( listener );
 		        var audioLoader = new THREE.AudioLoader();
-		        var url = '/WebAssets/audio/SlowBurn.mp3'
+		        var url = '/WebAssets/audio/04 Cabin Sessions (ft_ Exmag & Benny Bloom).mp3'
 		        audioLoader.load( url , function( buffer ) {
 					sound.setBuffer( buffer );
 					sound.setLoop(true);
@@ -279,6 +280,7 @@
 						time: { value: 1.0 },
 						audio : { type: "fv1",  value: new Array(bufferLength) },
 						sensitivity : { value: params.sensitivity },
+						amplitude : {value: params.amplitude },
 						noiseIterations : { value: params.noiseIterations },
 						lightColor : { value: new THREE.Vector4(1.0, 1.0, 1.0, 1.0) },
 						sinScale : { value: params.sinScale },
@@ -327,7 +329,8 @@
 
 			function initGui() {
 				params = {
-					sensitivity: 125.0,
+					sensitivity: 4.0,
+					amplitude : 250,
 					pointLightIntensity : 0.15,
 					time : 0.3,
 					noiseIterations : 6.0,
@@ -356,18 +359,20 @@
 				if( window.mobileAndTabletcheck() ) {
 					params['detail'] = 100;
 					params['noiseIterations'] = 3.0;
-					params['sensitivity'] = 15.0;
-					f2.add( params, "sensitivity", 1.0, 30.0 ).listen();
+					params['sensitivity'] = 1.0;
+					f2.add( params, "sensitivity", 0.2, 10.0 ).listen();
+					f2.add( params, "amplitude", 1.0, 500.0 ).listen();
 					f2.add( params, "noiseIterations", 1.0, 6.0 ).listen();
 					detail = f3.add( params, "detail", 1, 1000 ).listen();
 				} else {
-					f2.add( params, "sensitivity", 1.0, 1500.0 ).listen();
+					f2.add( params, "sensitivity", 0.2, 10.0 ).listen();
+					f2.add( params, "amplitude", 1.0, 500.0 ).listen();
 					f2.add( params, "noiseIterations", 1.0, 8.0 ).listen();
 					detail = f3.add( params, "detail", 1, 1000 ).listen();
 				}
-				f2.add( params, "sinScale", 0.0001, 10.0 ).listen();
+				f2.add( params, "sinScale", 0.0001, 0.8 ).listen();
 				f2.add( params, "scale", 0.0001, 0.006 ).listen();
-				size = f3.add( params, "size", 1, 30000 ).listen();
+				size = f3.add( params, "size", 1, 3000 ).listen();
 				
 				pointSize = f3.add( params, "pointSize", 1, 100 ).listen();
 				drawStyle = f3.add( params, "style", params.style);
@@ -628,6 +633,7 @@
 				object.material.uniforms.audio.value = audioArray;
 				object.material.uniforms.time.value += (time * 0.000005) * 0.7 + smoothVolume * smoothVolume * params.time;
 				object.material.uniforms.sensitivity.value = params.sensitivity;
+				object.material.uniforms.amplitude.value = params.amplitude;
 				object.material.uniforms.noiseIterations.value = params.noiseIterations;
 				object.material.uniforms.scale.value = params.scale;
 				object.material.uniforms.sinScale.value = params.sinScale;
