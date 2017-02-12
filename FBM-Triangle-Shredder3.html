@@ -174,11 +174,13 @@
 			varying vec4 vColor;
 
 			void main()	{
-				vec3 lightDir = normalize(vec3(1.0, 0.0, 0.0));
+				vec3 lightDir = normalize(vec3(0.0, 0.0, 1.0));
 				
 				vec4 color = lightColor;//vec4( vColor );
         		color *= dot(normalize(vNormal),lightDir);
-        		color = 0.5 * sin(color * colorContour) + 0.5;
+        		if (colorContour > 1.0) {
+	        		color = 0.5 * sin(color * colorContour) + 0.5;
+	        	}
 				// color.r += sin( vPosition.x * 10.0 + time ) * 0.5;
 				color.a = opacity;
 				gl_FragColor = color;
