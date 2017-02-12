@@ -339,7 +339,7 @@
 					detail : 250,
 					pointSize : 1,
 					playAudio : false,
-					scale : 0.006,
+					scale : 0.6,
 					sinScale : 0.2,
 					volume : 0.5,
 					colorContour : 3.0, 
@@ -371,7 +371,7 @@
 					detail = f3.add( params, "detail", 1, 1000 ).listen();
 				}
 				f2.add( params, "sinScale", 0.0001, 0.8 ).listen();
-				f2.add( params, "scale", 0.0001, 0.006 ).listen();
+				f2.add( params, "scale", 0.01, 0.6 ).listen();
 				size = f3.add( params, "size", 1, 3000 ).listen();
 				
 				pointSize = f3.add( params, "pointSize", 1, 100 ).listen();
@@ -635,7 +635,7 @@
 				object.material.uniforms.sensitivity.value = params.sensitivity;
 				object.material.uniforms.amplitude.value = params.amplitude;
 				object.material.uniforms.noiseIterations.value = params.noiseIterations;
-				object.material.uniforms.scale.value = params.scale;
+				object.material.uniforms.scale.value = 0.01*params.scale;
 				object.material.uniforms.sinScale.value = params.sinScale;
 				var color = colorTracker.getColor(analyser.getAverageFrequency(), 100);
 				object.material.uniforms.colorContour.value = params.colorContour;
