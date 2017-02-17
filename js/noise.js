@@ -1,3 +1,5 @@
+
+// ======== 1D Noise ========
 function hash(x) {
     var nx = x*1.380251;
 	var n = Math.floor(nx);
@@ -21,7 +23,7 @@ function smoothNoise(x) {
 function fractalNoise(x) {
 	
   	var p = x + 11.3951031;
-	var amp = 0.7;
+	  var amp = 0.7;
   	var scale = 10.0;
   	var result = 0.0;
   	for (var i = 0; i<6; i++) {

@@ -10,7 +10,7 @@
 	<body>
 		<script src="js/three.js"></script>
 		<script src="js/OrbitControls.js"></script>
-		<script src="js/noise.js"></script>
+		<script src="js/perlin.js"></script>
 		<script>
 
 			// @author PWhiddy
@@ -24,13 +24,17 @@
 			* near — Camera near plane. (Objects outside the near and far plane won't be rendered)
 			* far — Camera far plane.
 			*/
-			var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
+			var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 10000 );
 
 			// Move camera back so we are looking at the origin
 			camera.position.z = 5;
 
+
+			var time = 0.0;
+
 			// The threejs webgl renderer
 			var renderer = new THREE.WebGLRenderer({antialias: true});
+			renderer.setClearColor( 0xffffff );
 			// Tell renderer the dimensions of our screen
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.setPixelRatio( window.devicePixelRatio );
@@ -40,45 +44,18 @@
 			// adding orbit controls to allow camera movement
 			var controls = new THREE.OrbitControls( camera, renderer.domElement );
 
-			// Create our objects geometry with built-in mesh knot algorithim
-			//var geometry = new THREE.TorusKnotGeometry( 10, 3, 192, 96);
-
-			var geometry = new THREE.Geometry();
-
-			var vertCount = 20;
-			var faceCount = 10;
 			
-			for (var i = 0; i < vertCount; i++) {
-				geometry.vertices.push( new THREE.Vector3(Math.sin(i), Math.cos(i), 0));
-			//	geometry.vertices.push( new THREE.Vector3( i % 5, Math.floor(i/5), 0));
-
-				geometry.colors.push( new THREE.Color( Math.sin(i*0.2)*0.5+0.5, 
-													   Math.cos(i*0.3)*0.5+0.5, 
-													   Math.sin(i*0.4)*0.5+0.5));
-			}
-			for (var i = 0; i < faceCount; i++) {
-				geometry.faces.push( new THREE.Face3( i, vertCount-i-2, i+3 ));
-			}
-
-			geometry.computeBoundingSphere();
 			
-
-			/*
-			geometry = new THREE.PlaneGeometry(50,50,50,50);
-
-			for (var i = 0; i < geometry.vertices.length; i++ ) {
-				geometry.vertices[i].add(new THREE.Vector3( 0, 0, fractalNoise(i*0.002)*8 ));
-			}
-			geometry.computeVertexNormals();
-
-			*/
-
+			// Create starting plane geometry with 
+			// 175 width and heigh segments
+			geometry = new THREE.PlaneGeometry(20,20,175,175);
+			
 			console.log(geometry);
 			// The material properties of our object
-			var material = new THREE.MeshBasicMaterial( { vertexColors: THREE.VertexColors, side: THREE.DoubleSide } ); // color is in hexidecimal
-
+			var material = new THREE.MeshStandardMaterial( { color: 0xff2266, side: THREE.DoubleSide, wireframe: false } ); // color is in hexidecimal
 			// Use our geometry and material to create a mesh (What's a mesh? https://en.wikipedia.org/wiki/Polygon_mesh)
-			var mesh = new THREE.Line( geometry, material );
+			var mesh = new THREE.Mesh( geometry, material );
+			mesh.rotation.x += Math.PI/2;
 			// Add mesh to the scene
 			scene.add( mesh );
 
@@ -86,8 +63,8 @@
 			var pointLight = new THREE.PointLight(0xdddddd, 0.5);
 			scene.add(pointLight);
 			// Adjust light position to nicely illuminate object
-			pointLight.position.y = 5;
-			pointLight.position.x = 5;
+			pointLight.position.y = 70;
+			pointLight.position.x = 70;
 			//*/
 
 			/* Ambient lighting - try disabling one of the lights to see each's contribution */
@@ -101,9 +78,31 @@
 				// browser requests a new frame
 				requestAnimationFrame( render );
 				controls.update();
-				// Rotate our object
-				mesh.rotation.x += 0.005;
-				mesh.rotation.y += 0.005;
+				time += 0.005;
+
+			// Update vertices z coordinate
+			for (var i = 0; i < geometry.vertices.length; i++ ) {
+
+				var v = geometry.vertices[i];
+
+				var noiseOctaves = 9;
+				var a = 0.0;
+				var scale = 1.0;
+				var freq = 0.02;
+				// apply multiple octaves of noise
+				for (var n = 0; n < noiseOctaves; n++) {
+					a += Math.abs(scale*noise.simplex2( v.x*freq + 4.7+ time, 
+													    v.y*freq - 8.4 + time));
+					scale *= 0.5;
+					freq *= 2.0;
+				}
+
+				geometry.vertices[i].z = 1.5*Math.sin(a*5);
+				
+			}
+
+			geometry.verticesNeedUpdate = true;
+			geometry.computeVertexNormals();
 
 				// Render our scene
 				renderer.render(scene, camera);
