@@ -48,7 +48,7 @@
 			
 			// Create starting plane geometry with 
 			// 120 width and heigh segments
-			geometry = new THREE.PlaneGeometry(20,20,40,40);
+			geometry = new THREE.PlaneGeometry(20,20,120,120);
 			
 			console.log(geometry);
 			// The material properties of our object
@@ -99,7 +99,7 @@
 					freq *= 2.0;
 				}
 
-				geometry.vertices[i].z = 1.5*Math.sin(a*5);
+				geometry.vertices[i].z = 3.5*Math.sqrt(Math.sin(a*5));
 				
 			}
 
