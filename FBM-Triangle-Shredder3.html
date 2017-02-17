@@ -406,7 +406,7 @@
 					highFrequencyMix : 0.7,
 					audioSmoothing: 0.8,
 					size : 800,
-					detail : 400,
+					detail : 500,
 					pointSize : 1,
 					playAudio : false,
 					useMicrophone : false,
@@ -473,7 +473,7 @@
 
 			function updateGeometry (geomToUpdate, geom) {
 
-				//conver the geom into buffer because functions are stripped when pased through the worker
+				//conver the geom into buffer because functions are stripped when pased through the web worker
 				var geo = new THREE.BufferGeometry();
 				geo.addAttribute('position', geom.attributes.position);
 				geo.addAttribute('normal', geom.attributes.normal);

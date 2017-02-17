@@ -19,9 +19,12 @@ onmessage = function(e) {
 	} else if ( selectedGeometry == "Text" ) {
 		var font = e.data[4];
 		var text = e.data[5];
-		geometry = generateText(size, detail, font, text);
-	}  
+		tempFont = new THREE.Font();
+		tempFont.data = font.data;
+		font = tempFont;
 
+		geometry = generateText(size, detail, font, text);
+	}
 	postMessage([geomToUpdate, geometry]);
 }
 
