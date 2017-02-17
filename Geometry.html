@@ -52,8 +52,10 @@
 			
 			console.log(geometry);
 			// The material properties of our object
-			var material = new THREE.MeshStandardMaterial( { color: 0xff2266, side: THREE.DoubleSide, wireframe: false } ); // color is in hexidecimal
-			// Use our geometry and material to create a mesh (What's a mesh? https://en.wikipedia.org/wiki/Polygon_mesh)
+			var material = new THREE.MeshStandardMaterial( { color: 0xff2266, side: 
+				THREE.DoubleSide, wireframe: false } ); // color is in hexidecimal
+			// Use our geometry and material to create a mesh 
+			// (What's a mesh? https://en.wikipedia.org/wiki/Polygon_mesh)
 			var mesh = new THREE.Mesh( geometry, material );
 			mesh.rotation.x += Math.PI/2;
 			// Add mesh to the scene
@@ -91,8 +93,8 @@
 				var freq = 0.02;
 				// apply multiple octaves of noise
 				for (var n = 0; n < noiseOctaves; n++) {
-					a += Math.abs(scale*noise.simplex2( v.x*freq + 4.7+ time, 
-													    v.y*freq - 8.4 + time));
+					a += Math.abs(scale*noise.simplex2( v.x*freq + 4.7 + time, 
+			              					    v.y*freq - 8.4 + time));
 					scale *= 0.5;
 					freq *= 2.0;
 				}
