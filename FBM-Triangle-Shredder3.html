@@ -30,13 +30,18 @@
 			#oldie a { color:#da0 }
 
 			#progressBar {
-
+				position: absolute;
 			    width: 80%;
-			    text-align: center;
+			    top: 50%;
+			    left: 50%;
+			    z-index: 2;
+			    transform: translate(-50%, -50%);
 			    background-color: grey;
 			    z-index: 10;
 			}
+			
 			#bar {
+				o
 			    width: 1%;
 			    height: 30px;
 			    background-color: white;
@@ -299,7 +304,7 @@
 				function ( xhr ) {
 					var percent = xhr.loaded / xhr.total * 100;
 					console.log( percent + '% loaded' );
-				    var elem = document.getElementById("progressBar"); 
+				    var elem = document.getElementById("bar"); 
 				    elem.style.width = percent + '%'; 
 				},
 				function ( xhr ) {
