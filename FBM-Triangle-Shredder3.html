@@ -28,12 +28,25 @@
 			}
 
 			#oldie a { color:#da0 }
+
+			#progressBar {
+			    width: 80%;
+			    background-color: grey;
+			}
+			#bar {
+			    width: 1%;
+			    height: 30px;
+			    background-color: green;
+			}
 		</style>
 	</head>
 	<body>
 
 		<div id="container"></div>
 		<div id="info"><a href="http://uwc.graphics" target="_blank">CGPP</a> FBM Triangle Shredder</div>
+		<div id="progressBar">
+		  <div id="bar"></div>
+		</div>
 		<script src="js/MobileAndTabletCheck.js"></script>
 		<script src="js/three.js"></script>
 		<script src="js/dat.gui.min.js"></script>
@@ -200,10 +213,10 @@
 				vec4 color = lightColor;//vec4( vColor );
         		color *= dot(normalize(vNormal),lightDir);
         		float audioColor = colorContour * (audio[4] + audio[5] + audio[6] * audio[7] * 3.0)  * 0.0001;
-        		// if (audioColor > 1.0) {
+        		if (audioColor > 1.0) {
 
-	    		color = 0.5 * sin(color * audioColor) + 0.5;
-	        	// }
+		    		color = 0.5 * sin(color * audioColor) + 0.5;
+	        	}
 				// color.r += sin( vPosition.x * 10.0 + time ) * 0.5;
 				color.a = opacity;
 				gl_FragColor = vec4( color );
@@ -277,9 +290,14 @@
 					sound.play();
 					sound.autoplay = true;
 					params.playAudio = true;
+					var elem = document.getElementById("progressBar"); 
+					elem.style.display = 'none'; 
 		        },
 				function ( xhr ) {
-					console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+					var percent = xhr.loaded / xhr.total * 100;
+					console.log( percent + '% loaded' );
+				    var elem = document.getElementById("progressBar"); 
+				    elem.style.width = percent + '%'; 
 				},
 				function ( xhr ) {
 					console.log( 'An error happened' );
@@ -325,7 +343,7 @@
 					console.log( item, loaded, total );
 				};
 
-		        var geometry = new THREE.PlaneBufferGeometry(params.size, params.size, params.detail, params.detail);
+		        var geometry = new THREE.PlaneBufferGeometry(params.size, params.size, params.detail*2.0, params.detail*2.0);
 				noiseGeometry = new THREE.BufferGeometry();
 		 		noiseGeometry.addAttribute( "position", new THREE.BufferAttribute( geometry.getAttribute( "position" ).array, 3));
 		 		noiseGeometry.addAttribute( "normal", new THREE.BufferAttribute( geometry.getAttribute("normal").array, 3));
@@ -383,7 +401,9 @@
 				renderer.setClearColor( 0x101010 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				// scene.fog = new THREE.Fog(0x000000, 500, 5000);
 				container.appendChild( renderer.domElement );
+
 
 				controls = new THREE.OrbitControls( camera, renderer.domElement );
 				controls.enableDamping = true;
@@ -409,7 +429,7 @@
 					highFrequencyMix : 0.7,
 					audioSmoothing: 0.8,
 					size : 800,
-					detail : 400,
+					detail : 200,
 					pointSize : 1,
 					playAudio : false,
 					useMicrophone : false,
@@ -452,7 +472,7 @@
 				f2.add( params, "scale", 0.01, 0.6 );
 				f2.add( params, "abMix", 0.0, 1.0 );
 				f2.add( params, "highFrequencyMix", 0.01, 1.0 );
-				size = f3.add( params, "size", 1, 3000 );
+				size = f3.add( params, "size", 1, 30000 );
 				
 				pointSize = f3.add( params, "pointSize", 1, 10 );
 				drawStyle = f3.add( params, "style", params.style).listen();
@@ -484,6 +504,7 @@
 
 				var count;
 				if (geomToUpdate === "A") {
+					console.log(noiseGeometry);
 					count = noiseGeometry.getAttribute( "position" ).count * 3;
 					noiseGeometry.removeAttribute( "position" );
 					noiseGeometry.removeAttribute( "normal" );
@@ -492,17 +513,17 @@
 					noiseGeometry.removeAttribute( "positionB" );
 					noiseGeometry.removeAttribute( "normalB" );
 				}
-				
+
 				var newP = new Float32Array( count );
 				var pArr = geo.getAttribute("position").array;
 				var newCount = Math.min( geo.getAttribute("position").count * 3, count);
-				for (var i = 0; i < newCount; i++ ) {
+				for (var i = 0; i < count; i++ ) {
 					newP[i] = pArr[i];
 				}
 				var newN = new Float32Array( count );
 				var nArr = geo.getAttribute("normal").array;
 				newCount = Math.min( geo.getAttribute("normal").count * 3, count);
-				for (var i = 0; i < newCount; i++ ) {
+				for (var i = 0; i < count; i++ ) {
 					newN[i] = nArr[i];
 				}
 
