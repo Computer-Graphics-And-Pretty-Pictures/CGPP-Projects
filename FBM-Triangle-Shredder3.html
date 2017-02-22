@@ -238,6 +238,8 @@
 			} );	
 			init();
 			console.log(scene.children[0]);
+			params.detail = 175;
+			updateGeomAndDrawStyle("Line");
 			animate();		
 
 			function init() {
@@ -406,7 +408,7 @@
 					highFrequencyMix : 0.7,
 					audioSmoothing: 0.8,
 					size : 800,
-					detail : 150,
+					detail : 400,
 					pointSize : 1,
 					playAudio : false,
 					useMicrophone : false,
