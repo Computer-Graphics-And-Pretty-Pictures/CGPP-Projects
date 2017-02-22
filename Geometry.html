@@ -52,7 +52,7 @@
 			
 			console.log(geometry);
 			// The material properties of our object
-			var material = new THREE.MeshStandardMaterial( { color: 0xffaa33, shading: THREE.SmoothShading, side: 
+			var material = new THREE.MeshStandardMaterial( { color: 0x77aa33, shading: THREE.SmoothShading, side: 
 				THREE.DoubleSide, wireframe: false } ); // color is in hexidecimal
 			// Use our geometry and material to create a mesh 
 			// (What's a mesh? https://en.wikipedia.org/wiki/Polygon_mesh)
@@ -80,7 +80,7 @@
 				// browser requests a new frame
 				requestAnimationFrame( render );
 				controls.update();
-				time += 0.005;
+				time += 0.0005;
 
 			// Update vertices z coordinate
 			for (var i = 0; i < geometry.vertices.length; i++ ) {
@@ -99,7 +99,7 @@
 					freq *= 2.0;
 				}
 
-				geometry.vertices[i].z = 1.5*Math.sin(a*15);
+				geometry.vertices[i].z = 1.5*Math.pow(Math.sin(a*25)+1.0, 0.2);
 				
 			}
 
