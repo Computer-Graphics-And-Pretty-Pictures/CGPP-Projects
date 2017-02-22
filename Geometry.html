@@ -48,11 +48,11 @@
 			
 			// Create starting plane geometry with 
 			// 120 width and heigh segments
-			geometry = new THREE.PlaneGeometry(20,20,120,120);
+			geometry = new THREE.PlaneGeometry(20,20,320,320);
 			
 			console.log(geometry);
 			// The material properties of our object
-			var material = new THREE.MeshStandardMaterial( { color: 0xff2266, shading: THREE.SmoothShading, side: 
+			var material = new THREE.MeshStandardMaterial( { color: 0xffaa33, shading: THREE.SmoothShading, side: 
 				THREE.DoubleSide, wireframe: false } ); // color is in hexidecimal
 			// Use our geometry and material to create a mesh 
 			// (What's a mesh? https://en.wikipedia.org/wiki/Polygon_mesh)
@@ -90,7 +90,7 @@
 				var noiseOctaves = 9;
 				var a = 0.0;
 				var scale = 1.0;
-				var freq = 0.02;
+				var freq = 0.01;
 				// apply multiple octaves of noise
 				for (var n = 0; n < noiseOctaves; n++) {
 					a += Math.abs(scale*noise.simplex2( v.x*freq + 4.7 + time, 
@@ -99,7 +99,7 @@
 					freq *= 2.0;
 				}
 
-				geometry.vertices[i].z = 1.5*Math.sin(a*5);
+				geometry.vertices[i].z = 1.5*Math.sin(a*15);
 				
 			}
 
