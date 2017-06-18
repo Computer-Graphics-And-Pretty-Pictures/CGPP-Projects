@@ -175,6 +175,7 @@ var geometry = new THREE.TextGeometry( text, {
 	//
 
 	mesh = new THREE.Mesh( geometry, shaderMaterial );
+	mesh.frustumCulled = false;
 
 	return mesh;
 }
