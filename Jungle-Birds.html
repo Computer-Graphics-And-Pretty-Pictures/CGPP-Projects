@@ -106,7 +106,7 @@
 
 				camera = new THREE.PerspectiveCamera( 50, 
 					window.innerWidth / window.innerHeight, 0.5, 1800 );
-				camera.position.set(0, -100, 0);
+				camera.position.set(20, -100, 30);
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				mouse = new THREE.Vector2();
@@ -131,7 +131,7 @@
 
 				initGui();
 
-				var dim = 32;
+				var dim = 12;
 				var spacing = 4;
 		        vertCount = dim*dim*dim;
 		        geometry = new THREE.BufferGeometry();
@@ -190,7 +190,7 @@
 					new THREE.MeshBasicMaterial( { 
 						transparent: true, 
 						opacity: 0.005,
-						color: 0xFFFFFF } ) );
+						color: 0x000000 } ) );
 				plane.position.z = -50;
 				camera.add(plane);
 				scene.add(camera);
@@ -208,7 +208,7 @@
 					Momentum: 0.6,
 					Loopiness: 10.0,
 					pointSize: 140.0,
-					Fade: 0.054,
+					Fade: 0.2,
 				};
 				gui = new dat.GUI();
 				gui.add(params, "Energy", 0.0, 10.5);
@@ -244,6 +244,10 @@
 				var time = 0.005*performance.now();
 
 				plane.material.opacity = params.Fade*params.Fade;
+				plane.material.color.r = 2*Math.sin(time*0.008)+1;
+				plane.material.color.g = 2*Math.sin(time*0.008)+1;
+				plane.material.color.b = 2*Math.sin(time*0.008)+1;
+
 				
 				points.material.uniforms.time.value = time;
 				points.material.uniforms.cameraPos.value = camera.position;
