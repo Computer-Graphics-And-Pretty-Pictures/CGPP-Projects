@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Jungle Birds</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		
+	</head>
+	<body>
+
+		<div id="container"></div>
+		<div id="info"><a href="http://uwc.graphics" target="_blank">CGPP</a> Swoopin and Loopin</div>
+		<div id="progressBar">
+		  <div id="bar"></div>
+		</div>
+		<script src="js/MobileAndTabletCheck.js"></script>
+		<script src="js/three.js"></script>
+		<script src="js/dat.gui.min.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/stats.min.js"></script>
+	    <script src="js/OrbitControls.js"></script>
+	    <script src="js/WebMonkeys.js"></script>
+
+		<script id="vertexShader" type="x-shader/x-vertex" src=>
+
+			precision mediump float;
+			precision mediump int;
+
+			uniform mat4 modelViewMatrix; // optional
+			uniform mat4 projectionMatrix; // optional
+			uniform float time;
+
+			uniform vec2 mouse;
+			uniform vec3 cameraPos;
+			uniform float pSize;
+
+			attribute vec3 position;
+			attribute vec3 normal;
+			attribute vec4 colors;
+
+			varying vec3 vPosition;
+			varying vec4 vColor;
+
+
+		void main()	{
+
+			vPosition = position;
+			vColor = colors;
+
+	        vec3 p = position;
+
+			gl_Position = 
+				projectionMatrix * modelViewMatrix * vec4( p, 1.0 );
+			//float d = distance(p, cameraPos);
+			//gl_PointSize = pSize/(d);//4.0;//pointSize;
+
+		}
+
+		</script>
+
+		<script id="fragmentShader" type="x-shader/x-fragment">
+
+			precision mediump float;
+			precision mediump int;
+
+			uniform float time;
+
+			varying vec3 vPosition;
+			varying vec4 vColor;
+
+			void main()	{
+
+				vec4 col = vColor;
+				//col.g = 0.0;
+				gl_FragColor = vec4( col );
+				
+			}
+
+		</script>
+
+		
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var container, stats;
+
+			var camera, scene, renderer, controls;
+
+			var pointLight, skyBox, plane;
+
+			var gui, params;
+			var sound, playAudio, volume, geometry, 
+				material, mouse, noiseShape, noiseGeometry;
+
+
+			//var monkeys = WebMonkeys();
+			init();
+			console.log(scene.children[0]);
+			gui.closed = true;
+			animate();		
+
+			function init() {
+
+				container = document.getElementById( 'container' );
+
+				camera = new THREE.PerspectiveCamera( 50, 
+					window.innerWidth / window.innerHeight, 0.5, 1800 );
+				camera.position.set(0, -100, 0);
+
+				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				mouse = new THREE.Vector2();
+
+				renderer = new THREE.WebGLRenderer({ 
+					antialias : true,
+					preserveDrawingBuffer : true,
+				});
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.autoClear = false;
+
+				container.appendChild( renderer.domElement );
+
+				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.enableDamping = true;
+				controls.dampingFactor = 0.9;  
+				controls.zoomSpeed = 0.12;
+				controls.rotateSpeed = 0.15;	
+				controls.maxDistance = 5000;
+				controls.minDistance = 5
+
+				initGui();
+
+				var dim = 32;
+				var spacing = 4;
+		        vertCount = dim*dim*dim;
+		        geometry = new THREE.BufferGeometry();
+
+		        var paddedSize = vertCount*3;
+		        // Create cube of particles
+		        verts = new Float32Array(paddedSize);
+		        for (var i=0; i<vertCount; i++) {
+		        	verts[3*i+0] = spacing*(i%dim-dim/2);
+		        	verts[3*i+1] = spacing*Math.floor(i/dim)%dim-dim/2;
+		        	verts[3*i+2] = spacing*Math.floor(i/(dim*dim))-dim/2;
+		        }
+
+		        vels = new Float32Array(paddedSize);
+		        for (i of vels) i = 0.0;
+
+		        // Random initial colors (these are overriden after first frame)
+		        colors = new Float32Array(vertCount*4*4);
+		        for (var i=0; i<vertCount*4; i++) {
+		        	colors[4+i+0] = Math.random();
+		        	colors[4+i+1] = Math.random();
+		        	colors[4+i+2] = Math.random();
+		        	colors[4*i+3] = 1.0;
+		        }
+
+		        geometry.addAttribute( "position",
+		        	new THREE.BufferAttribute(verts, 3) );
+
+		        geometry.addAttribute( "colors",
+		        	new THREE.BufferAttribute(colors, 4));
+
+				material = new THREE.RawShaderMaterial( {
+					uniforms: {
+						time: { value: 1.0 },
+                        cameraPos : {value: camera.position},
+					//	pSize: {value : params.pointSize},
+						mouse : {value : mouse }
+					},
+					vertexShader: 
+						document.getElementById( 'vertexShader' ).textContent,
+					fragmentShader: 
+						document.getElementById( 'fragmentShader' ).textContent,
+					side: THREE.DoubleSide,
+					transparent: false,
+					depthTest: false
+				} );
+
+				points = new THREE.Mesh( geometry, material );
+
+				scene = new THREE.Scene();
+
+				scene.add(points);
+
+				plane = new THREE.Mesh( 
+					new THREE.PlaneGeometry( 100, 100 ), 
+					new THREE.MeshBasicMaterial( { 
+						transparent: true, 
+						opacity: 0.005,
+						color: 0xFFFFFF } ) );
+				plane.position.z = -50;
+				camera.add(plane);
+				scene.add(camera);
+        
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function initGui() {
+				params = {
+					Energy: 2.0,
+					Momentum: 0.6,
+					Loopiness: 10.0,
+					pointSize: 140.0,
+					Fade: 0.054,
+				};
+				gui = new dat.GUI();
+				gui.add(params, "Energy", 0.0, 10.5);
+				gui.add(params, "Momentum", 0.0, 0.995);
+				gui.add(params, "Loopiness", 1.0, 80.0);
+				//gui.add(params, "pointSize", 50, 250);
+				gui.add(params, "Fade", 0.0, 0.4)
+			}
+
+			function onDocumentMouseMove(event) {
+				mouse.x = ( event.clientX / window.innerWidth );
+				mouse.y = ( event.clientY / window.innerHeight );
+			}			
+
+			function onWindowResize( event ) {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				var time = 0.005*performance.now();
+
+				plane.material.opacity = params.Fade*params.Fade;
+				
+				points.material.uniforms.time.value = time;
+				points.material.uniforms.cameraPos.value = camera.position;
+				//points.material.uniforms.pSize.value = params.pointSize;
+
+				var rForce = params.Energy*params.Energy;
+				var pos = points.geometry.attributes.position.array;
+				var cols = points.geometry.attributes.colors.array;
+				
+				for (var i=0; i <vertCount; i++) {
+					var a = 3*i;
+					var b = 3*((i+1)%vertCount);
+	                // Get x,y,z delta between two particles
+					dx = pos[a+0] - pos[b+0];
+					dy = pos[a+1] - pos[b+1];
+					dz = pos[a+2] - pos[b+2];
+					// Calculate distance between the two
+					var dist = dx*dx+dy*dy+dz*dz+params.Loopiness;
+
+					// Update velocity based on force between the two
+					vels[a+0] -= rForce*dx/dist;
+					vels[a+1] -= rForce*dy/dist;
+					vels[a+2] -= rForce*dz/dist;
+
+					// Drag
+					vels[a+0] *= params.Momentum;
+					vels[a+1] *= params.Momentum;
+					vels[a+2] *= params.Momentum;
+
+					// xyz velocity vector is used as RGB color
+					var c = 4*i;
+					cols[c+0] = 10.0*vels[a+0];
+					cols[c+1] = 10.0*vels[a+1];
+					cols[c+2] = 10.0*vels[a+2];
+
+					// Update particle position
+					pos[a+0] += vels[a+0];
+					pos[a+1] += vels[a+1];
+					pos[a+2] += vels[a+2];
+
+				}
+
+				// Let threejs know to send updated particles to gpu
+				points.geometry.attributes.position.needsUpdate = true;
+				points.geometry.attributes.colors.needsUpdate = true;
+				//renderer.clear(true, false, false);
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>
