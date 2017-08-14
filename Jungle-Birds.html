@@ -19,7 +19,6 @@
 		<script src="js/Detector.js"></script>
 		<script src="js/stats.min.js"></script>
 	    <script src="js/OrbitControls.js"></script>
-	    <script src="js/WebMonkeys.js"></script>
 
 		<script id="vertexShader" type="x-shader/x-vertex" src=>
 
@@ -186,12 +185,12 @@
 				scene.add(points);
 
 				plane = new THREE.Mesh( 
-					new THREE.PlaneGeometry( 100, 100 ), 
+					new THREE.PlaneGeometry( 700, 700, 8,8 ), 
 					new THREE.MeshBasicMaterial( { 
 						transparent: true, 
 						opacity: 0.005,
 						color: 0x000000 } ) );
-				plane.position.z = -50;
+				plane.position.z = -120;
 				camera.add(plane);
 				scene.add(camera);
         
