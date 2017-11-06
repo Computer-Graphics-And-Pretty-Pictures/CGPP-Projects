@@ -1,4 +1,4 @@
-#Demo and Tutorial Projects
+# Demo and Tutorial Projects
 
 Welcome to the CGPP code repository!
 
@@ -6,7 +6,7 @@ Here you will find projects made with [three.js](https://threejs.org/)
 
 Many more examples like these can be found [here](https://threejs.org/examples)
   
-#A few good beginner tutorials:
+# A few good beginner tutorials:
 
 [Create a rotating box and load a model file](https://dinosaurscode.xyz/tutorials/2016/07/15/three-js-tutorial-for-beginners/)
 
@@ -15,7 +15,7 @@ Many more examples like these can be found [here](https://threejs.org/examples)
 [Interactive site demoing 3D graphics concepts](http://www.dimroc.com/reveal.js-threejs/)
 
 
-#Cool personal sites, blogs, and twitter accounts:
+# Cool personal sites, blogs, and twitter accounts:
 
 [Jaume Sanchez](https://www.clicktorelease.com/)
 
@@ -58,7 +58,7 @@ Many more examples like these can be found [here](https://threejs.org/examples)
 [Felix Woitzel](https://twitter.com/flexi23)
 
 
-#Advanced (Math and Graphics API heavy) resources: 
+# Advanced (Math and Graphics API heavy) resources: 
 
 [GPU Gems 3](https://developer.nvidia.com/gpugems/GPUGems3/gpugems3_pref01.html)
 
@@ -69,7 +69,7 @@ Many more examples like these can be found [here](https://threejs.org/examples)
 [Inigo Quilez Articles](http://www.iquilezles.org/www/index.htm)
 
 
-#Communities: 
+# Communities: 
 
 [ShaderToy](https://www.shadertoy.com/)
 
