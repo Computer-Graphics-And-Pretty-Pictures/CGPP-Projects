@@ -4,6 +4,10 @@
  * (c) 2017 Adam Shaw
  */
 
+body {
+   padding-left: 10px;
+}
+
  #calendar {
    max-width: 900px;
    float: right;
