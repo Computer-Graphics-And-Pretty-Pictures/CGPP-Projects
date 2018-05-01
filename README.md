@@ -17,6 +17,8 @@ Many more examples like these can be found [here](https://threejs.org/examples)
 
 # Cool personal sites, blogs, and twitter accounts:
 
+[Amanda Ghassaei](http://www.amandaghassaei.com/)
+
 [Jaume Sanchez](https://www.clicktorelease.com/)
 
 [David Li](http://david.li)
